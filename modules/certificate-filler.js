@@ -2,7 +2,7 @@
     'use strict';
     window.GovahiApp = window.GovahiApp || {};
 
-    // فقط در صفحه گواهینامه فعال شود (وجود کارت‌های گواهی)
+    // فقط در صفحه‌ای که کارت‌های گواهینامه دارد فعال می‌شود
     function init() {
         var certCards = document.querySelectorAll('[ng-repeat="item in items"]');
         if (!certCards.length) return; // صفحه مورد نظر نیست
