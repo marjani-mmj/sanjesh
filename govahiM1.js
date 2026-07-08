@@ -3,7 +3,7 @@
 
     // ========== تنظیمات API (باید ویرایش شوند) ==========
     var API_URL = 'https://testbetest.ir/sida/govahiM1/api/index.php'; // آدرس فایل index.php
-    var API_TOKEN = 'YOUR_STRONG_SECRET_TOKEN_HERE';       // توکن تعریف‌شده در config.php
+    var API_TOKEN = '8c9f2e1b4d8a6f3c9a1e8b5d0f7a2c6e9d4b1f8a3c7e5drb6f9a0c1e4d8b7f5';       // توکن تعریف‌شده در config.php
 
     // ====================================================
 
