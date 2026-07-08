@@ -1,0 +1,237 @@
+(function() {
+    // ---------- استایل‌های پنل ----------
+    const style = document.createElement('style');
+    style.textContent = `
+        #data-extractor-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 320px;
+            background: #ffffff;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            z-index: 100000;
+            padding: 15px;
+            font-family: Tahoma, sans-serif;
+            direction: rtl;
+        }
+        #data-extractor-panel h4 {
+            margin: 0 0 10px;
+            color: #007bff;
+            font-size: 16px;
+            text-align: center;
+        }
+        #data-extractor-panel label {
+            display: block;
+            margin: 8px 0 3px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        #data-extractor-panel input, #data-extractor-panel button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+        }
+        #data-extractor-panel button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #data-extractor-panel button:hover {
+            background: #0056b3;
+        }
+        #data-extractor-panel .status {
+            font-size: 12px;
+            color: #28a745;
+            margin-top: 5px;
+            text-align: center;
+        }
+        .extracted-row {
+            background-color: #d4edda !important;
+        }
+        #open-panel-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 99999;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ---------- ساخت دکمه و پنل ----------
+    const openBtn = document.createElement('button');
+    openBtn.id = 'open-panel-btn';
+    openBtn.textContent = '🔧 استخراج اطلاعات';
+    document.body.appendChild(openBtn);
+
+    const panel = document.createElement('div');
+    panel.id = 'data-extractor-panel';
+    panel.style.display = 'none';
+    panel.innerHTML = `
+        <h4>پنل استخراج اطلاعات</h4>
+        <label>آدرس API (اختیاری):</label>
+        <input type="text" id="api-url" placeholder="https://example.com/api/certificate" />
+        <button id="extract-btn">📋 استخراج و هایلایت</button>
+        <button id="send-btn" disabled>📤 ارسال به API</button>
+        <div id="status-msg" class="status"></div>
+    `;
+    document.body.appendChild(panel);
+
+    // ---------- متغیرهای سراسری ----------
+    window.extractedData = null;
+
+    // ---------- توابع کمکی ----------
+    function getTextByLabel(labelText) {
+        const labels = document.querySelectorAll('.school-info .marklabel');
+        for (let lbl of labels) {
+            if (lbl.textContent.trim() === labelText) {
+                const nextInfo = lbl.nextElementSibling;
+                if (nextInfo && nextInfo.classList.contains('infomark')) {
+                    return nextInfo.textContent.trim();
+                }
+            }
+        }
+        return '';
+    }
+
+    function extractHeaderInfo() {
+        const province = getTextByLabel('استان:');
+        const region = getTextByLabel('منطقه:');
+        const regionCode = getTextByLabel(''); // region code is separate label with infomark after region name
+        // Actually region code is an <label class="infomark ng-binding">1698</label> after the region name, but there is no marklabel for code alone.
+        // We can get it by searching the label that follows "منطقه:" and then the next label.infomark.
+        // Easier: find the regionId label.
+        const regionIdLabel = document.querySelector('.school-info .infomark.ng-binding[ng-bind="$root.userContext.regionId"]');
+        const regionId = regionIdLabel ? regionIdLabel.textContent.trim() : '';
+
+        const schoolCode = getTextByLabel('کد مدرسه:');
+        const schoolName = getTextByLabel('مدرسه:');
+
+        const major = getTextByLabel('رشته:');
+        const studentType = getTextByLabel('دانش آموز:');
+        const grade = getTextByLabel('پایه:');
+
+        return {
+            استان: province,
+            منطقه: region,
+            کد_منطقه: regionId,
+            کد_مدرسه: schoolCode,
+            نام_مدرسه: schoolName,
+            رشته: major,
+            پایه: grade,
+            نوع_دانش_آموز: studentType
+        };
+    }
+
+    function extractStudents() {
+        const rows = document.querySelectorAll('.modal-body tbody tr');
+        const students = [];
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 11) {
+                students.push({
+                    ردیف: cells[0].textContent.trim(),
+                    کد_دانش_آموزی: cells[1].textContent.trim(),
+                    نام_خانوادگی: cells[2].textContent.trim(),
+                    نام: cells[3].textContent.trim(),
+                    نام_پدر: cells[4].textContent.trim(),
+                    کد_ملی: cells[5].textContent.trim(),
+                    محل_صدور: cells[6].textContent.trim(),
+                    محل_تولد: cells[7].textContent.trim(),
+                    تاریخ_تولد: cells[8].textContent.trim(),
+                    جمع_نمرات: cells[9].textContent.trim(),
+                    معدل_کل: cells[10].textContent.trim(),
+                    شماره_گواهینامه: '' // initially empty
+                });
+            }
+        });
+        return students;
+    }
+
+    function highlightRows() {
+        const rows = document.querySelectorAll('.modal-body tbody tr');
+        rows.forEach(row => row.classList.add('extracted-row'));
+    }
+
+    // ---------- رویدادها ----------
+    openBtn.addEventListener('click', () => {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.getElementById('extract-btn').addEventListener('click', () => {
+        const header = extractHeaderInfo();
+        const students = extractStudents();
+        window.extractedData = { header, students };
+        highlightRows();
+        document.getElementById('status-msg').textContent = '✅ اطلاعات استخراج و ذخیره شد.';
+        document.getElementById('send-btn').disabled = false;
+        console.log('Extracted Data:', window.extractedData);
+    });
+
+    document.getElementById('send-btn').addEventListener('click', async () => {
+        const apiUrl = document.getElementById('api-url').value.trim();
+        if (!apiUrl) {
+            alert('لطفاً آدرس API را وارد کنید.');
+            return;
+        }
+        if (!window.extractedData) {
+            alert('ابتدا اطلاعات را استخراج کنید.');
+            return;
+        }
+
+        const statusMsg = document.getElementById('status-msg');
+        statusMsg.textContent = '⏳ در حال ارسال...';
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(window.extractedData)
+            });
+
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const result = await response.json();
+            // فرض می‌کنیم پاسخ شامل آرایه‌ای از دانش‌آموزان با شماره گواهینامه باشد
+            // ساختار نمونه: { students: [ { کد_ملی: "...", شماره_گواهینامه: "4000" }, ... ] }
+            if (result.students && Array.isArray(result.students)) {
+                const rows = document.querySelectorAll('.modal-body tbody tr');
+                result.students.forEach(cert => {
+                    // پیدا کردن ردیف متناظر با کد ملی (یا کد دانش‌آموزی)
+                    const matchingStudent = window.extractedData.students.find(
+                        s => s.کد_ملی === cert.کد_ملی || s.کد_دانش_آموزی === cert.کد_دانش_آموزی
+                    );
+                    if (matchingStudent) {
+                        matchingStudent.شماره_گواهینامه = cert.شماره_گواهینامه;
+                        // به‌روزرسانی سلول جدول
+                        const index = window.extractedData.students.indexOf(matchingStudent);
+                        if (rows[index]) {
+                            const certCell = rows[index].querySelectorAll('td')[11]; // ستون شماره گواهینامه (ایندکس 11)
+                            if (certCell) certCell.textContent = cert.شماره_گواهینامه;
+                        }
+                    }
+                });
+                statusMsg.textContent = '✅ شماره گواهینامه‌ها با موفقیت دریافت و ثبت شد.';
+            } else {
+                statusMsg.textContent = '⚠️ ساختار پاسخ API نامعتبر است.';
+            }
+        } catch (error) {
+            statusMsg.textContent = '❌ خطا در ارسال: ' + error.message;
+        }
+    });
+})();
