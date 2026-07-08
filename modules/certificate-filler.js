@@ -28,14 +28,14 @@
         for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
 
-            // استخراج کد ملی با تطبیق دقیق‌تر
+            // استخراج کد ملی
             var nationalCode = extractNationalCode(card);
             if (!nationalCode) {
                 console.warn('کد ملی در کارت ' + (i + 1) + ' پیدا نشد.');
                 continue;
             }
 
-            // یافتن فیلدها با ng-model (ایمن در برابر id تکراری)
+            // یافتن فیلدها
             var dateInput = card.querySelector('[ng-model="model.statrtDate"]');
             var numInput = card.querySelector('[ng-model="item.number"]');
             if (!dateInput || !numInput) {
@@ -79,12 +79,11 @@
     }
 
     function extractNationalCode(card) {
-        // روش ۱: پیدا کردن label یا span حاوی "کد ملی" و سپس span بعدی
+        // روش ۱: جستجوی span با کلاس ng-binding که شامل "کد ملی" باشد و span بعدی با کلاس control-label
         var elements = card.querySelectorAll('.ng-binding');
         for (var i = 0; i < elements.length; i++) {
             var el = elements[i];
             if (el.textContent.includes('کد ملی')) {
-                // span بعدی را با کلاس control-label پیدا کن (حتی اگر چند مرحله جلوتر باشد)
                 var next = el.nextElementSibling;
                 while (next) {
                     if (next.tagName === 'SPAN' && next.classList.contains('control-label')) {
@@ -103,9 +102,18 @@
     }
 
     function setInputValue(input, value) {
-        var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-        nativeSetter.call(input, value);
+        input.value = value;
         input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        // اطمینان از به‌روزرسانی AngularJS
+        if (window.angular && typeof angular !== 'undefined') {
+            var el = angular.element(input);
+            el.triggerHandler('input');
+            var scope = el.scope();
+            if (scope) {
+                scope.$apply();
+            }
+        }
     }
 
     if (document.readyState === 'complete') init();
