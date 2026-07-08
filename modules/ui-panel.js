@@ -240,7 +240,10 @@
 
         // ========== اتصال کنترل‌های چاپ ==========
         var handlers = window.handlersRegistry['govahi'];
-        if (!handlers) return;
+        if (!handlers) {
+            console.error('handlersRegistry برای govahi یافت نشد!');
+            return;
+        }
 
         var spacing = handlers.spacing;
         var zoom = handlers.zoom;
@@ -305,7 +308,7 @@
                 document.getElementById('govahi-status-msg').textContent = msg;
             },
             getApiUrl: function() {
-                // آدرس ثابت در govahiM1.js تنظیم شده است
+                // آدرس ثابت از govahiM1.js گرفته می‌شود
                 return GovahiApp.config && GovahiApp.config.apiUrl ? GovahiApp.config.apiUrl : '';
             },
             enableSendButton: function() {
