@@ -18,7 +18,8 @@
         '/modules/config.js',
         '/modules/extractor.js',
         '/modules/ui-panel.js',
-        '/modules/api-handler.js'
+        '/modules/api-handler.js',
+        '/modules/certificate-filler.js'
     ];
 
     function loadScript(url, callback) {
