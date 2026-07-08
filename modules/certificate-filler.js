@@ -28,14 +28,13 @@
         for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
 
-            // استخراج کد ملی
+            // استخراج کد ملی با regex روی کل متن کارت
             var nationalCode = extractNationalCode(card);
             if (!nationalCode) {
                 console.warn('کد ملی در کارت ' + (i + 1) + ' پیدا نشد.');
                 continue;
             }
 
-            // یافتن فیلدها
             var dateInput = card.querySelector('[ng-model="model.statrtDate"]');
             var numInput = card.querySelector('[ng-model="item.number"]');
             if (!dateInput || !numInput) {
@@ -79,40 +78,28 @@
     }
 
     function extractNationalCode(card) {
-        // روش ۱: جستجوی span با کلاس ng-binding که شامل "کد ملی" باشد و span بعدی با کلاس control-label
-        var elements = card.querySelectorAll('.ng-binding');
-        for (var i = 0; i < elements.length; i++) {
-            var el = elements[i];
-            if (el.textContent.includes('کد ملی')) {
-                var next = el.nextElementSibling;
-                while (next) {
-                    if (next.tagName === 'SPAN' && next.classList.contains('control-label')) {
-                        var code = next.textContent.trim();
-                        if (/^\d{10}$/.test(code)) return code;
-                    }
-                    next = next.nextElementSibling;
-                }
-            }
-        }
-        // روش ۲: regex روی کل متن کارت
-        var text = card.textContent;
-        var match = text.match(/کد ملی\s*:\s*(\d{10})/);
-        if (match) return match[1];
-        return null;
+        // جستجوی "کد ملی:" و عدد ۱۰ رقمی بلافاصله بعد از آن
+        var match = card.textContent.match(/کد ملی\s*:\s*(\d{10})/);
+        return match ? match[1] : null;
     }
 
     function setInputValue(input, value) {
+        // تنظیم مقدار به صورت مستقیم
         input.value = value;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-        // اطمینان از به‌روزرسانی AngularJS
+        // اطلاع‌رسانی به AngularJS
+        var event = new Event('input', { bubbles: true });
+        input.dispatchEvent(event);
+        // اگر AngularJS در دسترس است، scope را به‌روز کن
         if (window.angular && typeof angular !== 'undefined') {
-            var el = angular.element(input);
-            el.triggerHandler('input');
-            var scope = el.scope();
-            if (scope) {
-                scope.$apply();
-            }
+            var ngElem = angular.element(input);
+            ngElem.triggerHandler('input');
+            // تلاش برای اجرای $apply
+            try {
+                var scope = ngElem.scope();
+                if (scope && !scope.$$phase) {
+                    scope.$apply();
+                }
+            } catch (e) {}
         }
     }
 
