@@ -22,6 +22,30 @@
             var regionIdEl = document.querySelector(config.selectors.regionIdLabel);
             var regionId = regionIdEl ? regionIdEl.textContent.trim() : '';
 
+            // استخراج سال تحصیلی
+            var academicYearEl = document.querySelector('.header-kar p.ng-binding[ng-bind*="timeYearTypeTitle"]');
+            var academicYear = academicYearEl ? academicYearEl.textContent.trim() : '';
+
+            // استخراج دوره
+            var periodEl = document.querySelector('.header-kar p.ng-scope[ng-if*="row == 18"], .header-kar p.ng-scope[ng-if*="row == 19"]');
+            var periodText = periodEl ? periodEl.textContent.trim() : '';
+            // حذف پیشوند "دوره : "
+            var period = periodText.replace('دوره : ', '').trim();
+
+            // استخراج نام مدیر
+            var managerName = '';
+            var footRows = document.querySelectorAll('.panel-footer-report .col-md-4');
+            for (var j = 0; j < footRows.length; j++) {
+                var h6 = footRows[j].querySelector('h6');
+                if (h6 && h6.textContent.trim() === 'مدیر') {
+                    var infolabel = footRows[j].querySelector('.infomark');
+                    if (infolabel) {
+                        managerName = infolabel.textContent.trim();
+                    }
+                    break;
+                }
+            }
+
             return {
                 استان: getTextByLabel(sel.province),
                 منطقه: getTextByLabel(sel.region),
@@ -30,7 +54,10 @@
                 نام_مدرسه: getTextByLabel(sel.schoolName),
                 رشته: getTextByLabel(sel.major),
                 پایه: getTextByLabel(sel.grade),
-                نوع_دانش_آموز: getTextByLabel(sel.studentType)
+                نوع_دانش_آموز: getTextByLabel(sel.studentType),
+                سال_تحصیلی: academicYear,
+                دوره: period,
+                نام_مدیر: managerName
             };
         },
 
