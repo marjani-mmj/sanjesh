@@ -1,15 +1,12 @@
 (function() {
     'use strict';
 
-    // دریافت آدرس پایه از تگ اسکریپت خود
     var scripts = document.getElementsByTagName('script');
     var currentScript = scripts[scripts.length - 1];
-    var baseUrl = currentScript.src.replace(/\/[^\/]*$/, ''); // حذف نام فایل
+    var baseUrl = currentScript.src.replace(/\/[^\/]*$/, '');
 
-    // ایجاد فضای نام سراسری
     window.GovahiApp = window.GovahiApp || {};
 
-    // لیست ماژول‌ها به ترتیب وابستگی
     var modules = [
         '/modules/config.js',
         '/modules/extractor.js',
@@ -29,7 +26,6 @@
 
     function loadModulesSequentially(index) {
         if (index >= modules.length) {
-            // همه ماژول‌ها بارگذاری شدند – بررسی وجود ماژول‌ها
             if (typeof GovahiApp.extractor === 'undefined' ||
                 typeof GovahiApp.ui === 'undefined' ||
                 typeof GovahiApp.apiHandler === 'undefined') {
@@ -37,7 +33,6 @@
                 return;
             }
 
-            // اتصال رویدادهای دکمه‌ها
             GovahiApp.ui.onExtract(function() {
                 var header = GovahiApp.extractor.extractHeader();
                 var students = GovahiApp.extractor.extractStudents();
