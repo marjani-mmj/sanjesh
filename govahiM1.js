@@ -1,6 +1,12 @@
 (function() {
     'use strict';
 
+    // ========== تنظیمات API (باید ویرایش شوند) ==========
+    var API_URL = 'https://your-domain.com/api/index.php'; // آدرس فایل index.php
+    var API_TOKEN = 'YOUR_STRONG_SECRET_TOKEN_HERE';       // توکن تعریف‌شده در config.php
+
+    // ====================================================
+
     var scripts = document.getElementsByTagName('script');
     var currentScript = scripts[scripts.length - 1];
     var baseUrl = currentScript.src.replace(/\/[^\/]*$/, '');
@@ -33,6 +39,63 @@
                 return;
             }
 
+            // ========== بازنویسی بخش API با توکن و آدرس ثابت ==========
+            GovahiApp.config = GovahiApp.config || {};
+            GovahiApp.config.apiUrl = API_URL;
+            GovahiApp.config.apiToken = API_TOKEN;
+
+            // فریب UI برای استفاده از آدرس ثابت
+            GovahiApp.ui.getApiUrl = function() {
+                return GovahiApp.config.apiUrl;
+            };
+
+            // پنهان کردن فیلد ورودی آدرس (اختیاری)
+            var apiInput = document.getElementById('api-url-input');
+            if (apiInput) {
+                apiInput.style.display = 'none';
+            }
+
+            // بازنویسی متد send برای اضافه کردن هدر Authorization
+            GovahiApp.apiHandler.send = function(data) {
+                var url = GovahiApp.ui.getApiUrl();
+                if (!url) {
+                    alert('آدرس API تنظیم نشده است.');
+                    return Promise.reject();
+                }
+                if (!data || !data.students) {
+                    alert('داده‌ای برای ارسال وجود ندارد.');
+                    return Promise.reject();
+                }
+
+                GovahiApp.ui.setStatus('⏳ در حال ارسال...');
+
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + GovahiApp.config.apiToken
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(function(response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
+                .then(function(result) {
+                    if (result.students) {
+                        // استفاده از متد اصلی برای به‌روزرسانی جدول
+                        GovahiApp.apiHandler.updateCertificates(result.students);
+                        GovahiApp.ui.setStatus('✅ شماره گواهینامه‌ها دریافت و ثبت شد.');
+                    } else {
+                        GovahiApp.ui.setStatus('⚠️ ساختار پاسخ نامعتبر.');
+                    }
+                })
+                .catch(function(err) {
+                    GovahiApp.ui.setStatus('❌ خطا: ' + err.message);
+                });
+            };
+
+            // ========== اتصال رویدادها ==========
             GovahiApp.ui.onExtract(function() {
                 var header = GovahiApp.extractor.extractHeader();
                 var students = GovahiApp.extractor.extractStudents();
