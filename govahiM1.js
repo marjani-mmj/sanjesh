@@ -17,7 +17,6 @@
     var modules = [
         '/modules/config.js',
         '/modules/extractor.js',
-        '/modules/print-settings.js',   // ← جدید
         '/modules/ui-panel.js',
         '/modules/api-handler.js'
     ];
