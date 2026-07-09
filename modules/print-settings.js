@@ -60,7 +60,7 @@
         refresh();
     }
 
-    // ========== اتصال دکمه‌ها (بدون ردیف پایین) ==========
+    // ========== اتصال دکمه‌ها ==========
     function bindControls() {
         // ---- ردیف بالا ----
         document.getElementById('govahi-offsetY-up-dec5')?.addEventListener('click', function() { settings.offsetY -= 5; refresh(); });
@@ -92,12 +92,6 @@
         updateDisplay();
     }
 
-    // ========== پایش DOM برای Angular ==========
-    var observer = new MutationObserver(function() {
-        if (document.getElementById('print-content')) refresh();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-
     // ========== API عمومی ==========
     GovahiApp.printSettings = {
         apply: apply,
@@ -106,5 +100,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (bottom row removed)');
+    console.log('✅ print-settings module loaded. (Observer removed)');
 })();
