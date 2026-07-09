@@ -10,7 +10,7 @@
         scale: 1,          // بزرگنمایی (۱ = ۱۰۰٪)
         widthOffset: 0,    // افزایش/کاهش عرض بر حسب پیکسل
         cardGap: 0,        // فاصلهٔ عمودی بین کارت‌ها (پیکسل)
-        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل)
+        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل) – margin-left روی کارت‌های سمت چپ
     };
 
     var baseWidth = null;
@@ -20,18 +20,19 @@
         var target = document.getElementById('print-content');
         if (!target || !document.body.contains(target)) return;
 
-        // ۱. ذخیره عرض اولیه
+        // ۱. ذخیره عرض اولیه (فقط یک‌بار)
         if (baseWidth === null) {
             baseWidth = target.getBoundingClientRect().width;
         }
 
-        // ۲. رفع محدودیت‌ها
+        // ۲. رفع محدودیت‌های ارتفاع، overflow و اکنون max-width
         target.style.setProperty('max-height', 'none', 'important');
+        target.style.setProperty('max-width', 'none', 'important');   // ← جدید: برای افزایش بدون محدودیت
         target.style.setProperty('overflow', 'visible', 'important');
         target.style.setProperty('margin', '0', 'important');
         target.style.setProperty('padding', '0', 'important');
 
-        // ۳. عرض کلی
+        // ۳. اعمال عرض بر حسب پیکسل
         var newWidth = baseWidth + settings.widthOffset;
         target.style.setProperty('width', newWidth + 'px', 'important');
 
@@ -40,40 +41,26 @@
         target.style.setProperty('transform', transformValue, 'important');
         target.style.setProperty('transform-origin', 'top right', 'important');
 
-        // ۵. فاصلهٔ عمودی (margin-bottom) روی هر کارت
-        var cards = target.querySelectorAll('.col-md-6');
-        cards.forEach(function(card) {
+        // ۵. فاصلهٔ عمودی (همهٔ کارت‌ها)
+        var allCards = target.querySelectorAll('.col-md-6');
+        allCards.forEach(function(card) {
             card.style.marginBottom = settings.cardGap + 'px';
         });
 
-        // ۶. فاصلهٔ افقی با flexbox
-        var row = target.querySelector('.row.printt');
-        if (row) {
-            if (settings.cardGapH > 0) {
-                row.style.display = 'flex';
-                row.style.flexWrap = 'wrap';
-                row.style.justifyContent = 'flex-end';  // RTL
-                row.style.gap = settings.cardGapH + 'px';
-                // پهنای هر کارت به‌صورت ۵۰٪ منهای نصف گپ
-                var cardWidth = 'calc(50% - ' + (settings.cardGapH / 2) + 'px)';
-                cards.forEach(function(card) {
-                    card.style.width = cardWidth;
-                    card.style.flex = 'none';
-                });
+        // ۶. فاصلهٔ افقی: فقط کارت‌های سمت چپ (ایندکس‌های فرد در RTL)
+        allCards.forEach(function(card, index) {
+            if (index % 2 === 1) { // کارت سمت چپ
+                card.style.marginLeft = settings.cardGapH + 'px';
+                card.style.width = 'calc(50% - ' + settings.cardGapH + 'px)';
+                card.style.flex = 'none';
             } else {
-                // بازگشت به حالت پیش‌فرض (float)
-                row.style.display = '';
-                row.style.flexWrap = '';
-                row.style.justifyContent = '';
-                row.style.gap = '';
-                cards.forEach(function(card) {
-                    card.style.width = '';  // 50% پیش‌فرض بوت‌استرپ
-                    card.style.flex = '';
-                });
+                card.style.marginLeft = '';
+                card.style.width = '';  // بازگشت به ۵۰٪ پیش‌فرض
+                card.style.flex = '';
             }
-        }
+        });
 
-        // ۷. دکمهٔ چاپ (فوتر)
+        // ۷. دکمهٔ چاپ (فوتر) – بالای محتوای overflow شده
         var modalContent = target.closest('.modal-content');
         if (modalContent) {
             var footer = modalContent.querySelector('.modal-footer');
@@ -139,13 +126,13 @@
         document.getElementById('govahi-width-inc')?.addEventListener('click', function() { settings.widthOffset += 1; refresh(); });
         document.getElementById('govahi-width-inc5')?.addEventListener('click', function() { settings.widthOffset += 5; refresh(); });
 
-        // ---- فاصلهٔ عمودی (cardGap) ----
+        // ---- فاصلهٔ عمودی ----
         document.getElementById('govahi-cardGap-dec5')?.addEventListener('click', function() { settings.cardGap -= 5; refresh(); });
         document.getElementById('govahi-cardGap-dec')?.addEventListener('click', function() { settings.cardGap -= 1; refresh(); });
         document.getElementById('govahi-cardGap-inc')?.addEventListener('click', function() { settings.cardGap += 1; refresh(); });
         document.getElementById('govahi-cardGap-inc5')?.addEventListener('click', function() { settings.cardGap += 5; refresh(); });
 
-        // ---- فاصلهٔ افقی (cardGapH) ----
+        // ---- فاصلهٔ افقی ----
         document.getElementById('govahi-cardGapH-dec5')?.addEventListener('click', function() { settings.cardGapH -= 5; refresh(); });
         document.getElementById('govahi-cardGapH-dec')?.addEventListener('click', function() { settings.cardGapH -= 1; refresh(); });
         document.getElementById('govahi-cardGapH-inc')?.addEventListener('click', function() { settings.cardGapH += 1; refresh(); });
@@ -171,5 +158,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (flex-based horizontal gap)');
+    console.log('✅ print-settings module loaded. (max-width fix + horizontal gap)');
 })();
