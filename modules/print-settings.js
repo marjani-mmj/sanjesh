@@ -1,102 +1,209 @@
-// C:\Users\manager\Desktop\sida cod\govahiM1\modules\print-settings.js
-(function() {
+// modules/print-settings.js
+(function () {
     'use strict';
+
     window.GovahiApp = window.GovahiApp || {};
 
-    // ----- state -----
     var spacing = {
-        top: 0,
-        bottom: 0,
-        right: 0,
-        width: 0,
-        scale: 100
+        moveX: 0,      // حرکت افقی
+        moveY: 0,      // حرکت عمودی
+        zoom: 100      // درصد
     };
 
-    // ----- اعمال تنظیمات روی المان چاپ -----
+    function getTarget() {
+        return document.querySelector("#print-content .panel-body-print")
+            || document.getElementById("print-content");
+    }
+
     function applySettings() {
-        var target = document.getElementById('print-content');
+
+        var target = getTarget();
+
         if (!target) {
-            console.warn('print-settings: #print-content یافت نشد.');
+            console.warn("print-content پیدا نشد.");
             return;
         }
 
-        target.style.setProperty('max-height', 'none', 'important');
-        target.style.setProperty('overflow', 'visible', 'important');
-        target.style.setProperty('margin-top', spacing.top + 'px', 'important');
-        target.style.setProperty('margin-bottom', spacing.bottom + 'px', 'important');
-        target.style.setProperty('margin-right', spacing.right + 'px', 'important');
+        target.style.setProperty("max-height","none","important");
+        target.style.setProperty("overflow","visible","important");
 
-        if (spacing.width !== 0) {
-            target.style.setProperty('width', (100 + spacing.width) + '%', 'important');
-        } else {
-            target.style.setProperty('width', '100%', 'important');
-        }
+        target.style.setProperty(
+            "transform",
+            "translate(" +
+            spacing.moveX + "px," +
+            spacing.moveY + "px) scale(" +
+            (spacing.zoom/100) +
+            ")",
+            "important"
+        );
 
-        var scaleValue = spacing.scale / 100;
-        target.style.setProperty('transform', 'scale(' + scaleValue + ')', 'important');
-        target.style.setProperty('transform-origin', 'top center', 'important');
+        target.style.setProperty(
+            "transform-origin",
+            "top right",
+            "important"
+        );
     }
 
-    // ----- به‌روزرسانی نمایشگرهای عددی در پنل -----
-    function updateDisplay() {
-        var mt = document.getElementById('govahi-marginTopVal');
-        var mb = document.getElementById('govahi-marginBottomVal');
-        var mr = document.getElementById('govahi-marginRightVal');
-        var mw = document.getElementById('govahi-widthVal');
-        var zm = document.getElementById('govahi-zoomVal');
-        if (mt) mt.textContent = spacing.top;
-        if (mb) mb.textContent = spacing.bottom;
-        if (mr) mr.textContent = spacing.right;
-        if (mw) mw.textContent = spacing.width;
-        if (zm) zm.textContent = spacing.scale + '%';
+    function updateDisplay(){
+
+        var top=document.getElementById("govahi-marginTopVal");
+        var bottom=document.getElementById("govahi-marginBottomVal");
+        var right=document.getElementById("govahi-marginRightVal");
+        var zoom=document.getElementById("govahi-zoomVal");
+
+        if(top) top.textContent=spacing.moveY;
+        if(bottom) bottom.textContent=-spacing.moveY;
+        if(right) right.textContent=spacing.moveX;
+        if(zoom) zoom.textContent=spacing.zoom+"%";
     }
 
-    // ----- توابع کمکی برای اتصال دکمه‌ها -----
-    function bindControls() {
-        // بالا
-        document.getElementById('govahi-marginTopInc')?.addEventListener('click', function() { spacing.top++; updateDisplay(); });
-        document.getElementById('govahi-marginTopDec')?.addEventListener('click', function() { spacing.top--; updateDisplay(); });
-        document.getElementById('govahi-marginTopInc5')?.addEventListener('click', function() { spacing.top += 5; updateDisplay(); });
-        document.getElementById('govahi-marginTopDec5')?.addEventListener('click', function() { spacing.top -= 5; updateDisplay(); });
+    function refresh(){
 
-        // پایین
-        document.getElementById('govahi-marginBottomInc')?.addEventListener('click', function() { spacing.bottom++; updateDisplay(); });
-        document.getElementById('govahi-marginBottomDec')?.addEventListener('click', function() { spacing.bottom--; updateDisplay(); });
-        document.getElementById('govahi-marginBottomInc5')?.addEventListener('click', function() { spacing.bottom += 5; updateDisplay(); });
-        document.getElementById('govahi-marginBottomDec5')?.addEventListener('click', function() { spacing.bottom -= 5; updateDisplay(); });
+        applySettings();
+        updateDisplay();
 
-        // راست
-        document.getElementById('govahi-marginRightInc')?.addEventListener('click', function() { spacing.right++; updateDisplay(); });
-        document.getElementById('govahi-marginRightDec')?.addEventListener('click', function() { spacing.right--; updateDisplay(); });
-        document.getElementById('govahi-marginRightInc5')?.addEventListener('click', function() { spacing.right += 5; updateDisplay(); });
-        document.getElementById('govahi-marginRightDec5')?.addEventListener('click', function() { spacing.right -= 5; updateDisplay(); });
+    }
 
-        // پهنا
-        document.getElementById('govahi-widthInc')?.addEventListener('click', function() { spacing.width++; updateDisplay(); });
-        document.getElementById('govahi-widthDec')?.addEventListener('click', function() { spacing.width--; updateDisplay(); });
-        document.getElementById('govahi-widthInc5')?.addEventListener('click', function() { spacing.width += 5; updateDisplay(); });
-        document.getElementById('govahi-widthDec5')?.addEventListener('click', function() { spacing.width -= 5; updateDisplay(); });
+    function bindControls(){
 
-        // بزرگنمایی
-        document.getElementById('govahi-zoomInc')?.addEventListener('click', function() { spacing.scale = Math.min(200, spacing.scale + 1); updateDisplay(); });
-        document.getElementById('govahi-zoomDec')?.addEventListener('click', function() { spacing.scale = Math.max(10, spacing.scale - 1); updateDisplay(); });
-        document.getElementById('govahi-zoomInc5')?.addEventListener('click', function() { spacing.scale = Math.min(200, spacing.scale + 5); updateDisplay(); });
-        document.getElementById('govahi-zoomDec5')?.addEventListener('click', function() { spacing.scale = Math.max(10, spacing.scale - 5); updateDisplay(); });
+        //---------------- بالا ----------------
 
-        // دکمه اعمال تنظیمات
-        document.getElementById('govahi-applySettingsBtn')?.addEventListener('click', applySettings);
+        document.getElementById("govahi-marginTopInc")?.addEventListener("click",function(){
 
-        // مقداردهی اولیه نمایشگرها
+            spacing.moveY-=1;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginTopDec")?.addEventListener("click",function(){
+
+            spacing.moveY+=1;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginTopInc5")?.addEventListener("click",function(){
+
+            spacing.moveY-=5;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginTopDec5")?.addEventListener("click",function(){
+
+            spacing.moveY+=5;
+            refresh();
+
+        });
+
+        //---------------- پایین ----------------
+
+        document.getElementById("govahi-marginBottomInc")?.addEventListener("click",function(){
+
+            spacing.moveY+=1;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginBottomDec")?.addEventListener("click",function(){
+
+            spacing.moveY-=1;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginBottomInc5")?.addEventListener("click",function(){
+
+            spacing.moveY+=5;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginBottomDec5")?.addEventListener("click",function(){
+
+            spacing.moveY-=5;
+            refresh();
+
+        });
+
+        //---------------- راست ----------------
+
+        document.getElementById("govahi-marginRightInc")?.addEventListener("click",function(){
+
+            spacing.moveX-=1;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginRightDec")?.addEventListener("click",function(){
+
+            spacing.moveX+=1;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginRightInc5")?.addEventListener("click",function(){
+
+            spacing.moveX-=5;
+            refresh();
+
+        });
+
+        document.getElementById("govahi-marginRightDec5")?.addEventListener("click",function(){
+
+            spacing.moveX+=5;
+            refresh();
+
+        });
+
+        //---------------- زوم ----------------
+
+        document.getElementById("govahi-zoomInc")?.addEventListener("click",function(){
+
+            spacing.zoom=Math.min(200,spacing.zoom+1);
+            refresh();
+
+        });
+
+        document.getElementById("govahi-zoomDec")?.addEventListener("click",function(){
+
+            spacing.zoom=Math.max(30,spacing.zoom-1);
+            refresh();
+
+        });
+
+        document.getElementById("govahi-zoomInc5")?.addEventListener("click",function(){
+
+            spacing.zoom=Math.min(200,spacing.zoom+5);
+            refresh();
+
+        });
+
+        document.getElementById("govahi-zoomDec5")?.addEventListener("click",function(){
+
+            spacing.zoom=Math.max(30,spacing.zoom-5);
+            refresh();
+
+        });
+
+        //---------------- اعمال ----------------
+
+        document.getElementById("govahi-applySettingsBtn")
+        ?.addEventListener("click",refresh);
+
         updateDisplay();
     }
 
-    // ----- API عمومی -----
-    GovahiApp.printSettings = {
-        spacing: spacing,
-        applySettings: applySettings,
-        updateDisplay: updateDisplay,
-        bindControls: bindControls   // در ui-panel.js صدا زده می‌شود
+    // هنگام چاپ دوباره اعمال شود
+    window.addEventListener("beforeprint",applySettings);
+
+    GovahiApp.printSettings={
+
+        spacing:spacing,
+        applySettings:applySettings,
+        bindControls:bindControls,
+        updateDisplay:updateDisplay
+
     };
 
-    console.log('print-settings module loaded.');
 })();
