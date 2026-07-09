@@ -134,7 +134,7 @@
         });
     };
 
-    // ========== افزودن دکمه به پنل (فقط یکبار) ==========
+    // ========== افزودن دکمه به پنل (بیرون از ردیف دکمه‌ها) ==========
     function addButtonToPanel() {
         var checkInterval = setInterval(function () {
             var panel = document.getElementById('govahi-panel');
@@ -156,10 +156,12 @@
                     GovahiApp.fillCertificates();
                 });
 
-                var sendBtn = document.getElementById('govahi-send-to-api-btn');
-                if (sendBtn) {
-                    sendBtn.parentNode.insertBefore(btn, sendBtn.nextSibling);
+                // درج بعد از ردیف دکمه‌های اصلی (action-row)، نه داخل آن
+                var actionRow = document.getElementById('govahi-action-row');
+                if (actionRow) {
+                    actionRow.parentNode.insertBefore(btn, actionRow.nextSibling);
                 } else {
+                    // حالت احتیاطی: در انتهای بخش اضافه شود
                     actionSection.appendChild(btn);
                 }
 
