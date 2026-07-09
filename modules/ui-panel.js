@@ -1,3 +1,4 @@
+// C:\Users\manager\Desktop\sida cod\govahiM1\modules\ui-panel.js
 (function() {
     'use strict';
     window.GovahiApp = window.GovahiApp || {};
@@ -15,7 +16,6 @@
         var target = document.getElementById('print-content');
         if (!target) return;
 
-        // حذف max-height و overflow برای نمایش کامل تغییرات (اختیاری)
         target.style.setProperty('max-height', 'none', 'important');
         target.style.setProperty('overflow', 'visible', 'important');
 
@@ -113,7 +113,6 @@
             <span class="close-btn" id="govahi-close-btn">&times;</span>
         </div>
         <div class="panel-body">
-            <!-- بخش تنظیمات چاپ -->
             <div class="section-title">📏 حاشیه‌ها و بزرگنمایی</div>
 
             <div class="row-control">
@@ -161,7 +160,6 @@
 
             <div class="separator"></div>
 
-            <!-- بخش عملیات گواهینامه -->
             <div class="section-title">📋 عملیات گواهینامه</div>
             <button class="action-btn" id="govahi-extract-btn">📋 استخراج و هایلایت</button>
             <button class="action-btn" id="govahi-send-to-api-btn" disabled>📤 ارسال به API</button>
@@ -262,7 +260,7 @@
 
     document.getElementById('govahi-applySettingsBtn').addEventListener('click', applySettings);
 
-    // ========== API عمومی (برای govahiM1.js) ==========
+    // ========== API عمومی ==========
     GovahiApp.ui = {
         togglePanel: function() {
             if (panel.style.display === 'none') {
@@ -295,6 +293,5 @@
         }
     };
 
-    // مقداردهی اولیه نمایشگرها
     updateDisplay();
 })();
