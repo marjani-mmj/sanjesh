@@ -394,6 +394,14 @@
         },
         onSend: function(cb) {
             document.getElementById('govahi-send-to-api-btn').onclick = cb;
+        },
+        // متدهای جدید برای فعال/غیرفعال‌سازی دکمه‌ها
+        setExtractEnabled: function(enabled) {
+            document.getElementById('govahi-extract-btn').disabled = !enabled;
+        },
+        setAssignEnabled: function(enabled) {
+            var assignBtn = document.getElementById('govahi-assign-local-btn');
+            if (assignBtn) assignBtn.disabled = !enabled;
         }
     };
 
