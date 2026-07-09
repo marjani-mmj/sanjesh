@@ -5,10 +5,10 @@
 
     // ========== State ==========
     var settings = {
-        offsetX: 0,   // جابه‌جایی افقی (منفی = فضای صحافی راست)
-        offsetY: 0,   // جابه‌جایی عمودی (مثبت = پایین)
-        scale: 1,     // بزرگنمایی
-        widthOffset: 0 // درصد تغییر عرض (0 = 100% اولیه)
+        offsetX: 0,        // جابه‌جایی افقی (منفی = فضای صحافی راست)
+        offsetY: 0,        // جابه‌جایی عمودی (مثبت = پایین)
+        scale: 1,          // بزرگنمایی (۱ = ۱۰۰٪)
+        widthOffset: 0     // تغییر عرض بر حسب درصد
     };
 
     // ========== اعمال تنظیمات ==========
@@ -16,11 +16,8 @@
         var target = document.getElementById('print-content');
         if (!target || !document.body.contains(target)) return;
 
-        // حذف محدودیت‌های ارتفاع و overflow
         target.style.setProperty('max-height', 'none', 'important');
         target.style.setProperty('overflow', 'visible', 'important');
-
-        // صفر کردن margin و padding
         target.style.setProperty('margin', '0', 'important');
         target.style.setProperty('padding', '0', 'important');
 
@@ -41,11 +38,14 @@
 
     function updateDisplay() {
         var ox = document.getElementById('govahi-offsetX-val');
-        var oy = document.getElementById('govahi-offsetY-val');
+        var oyTop = document.getElementById('govahi-offsetY-val-top');
+        var oyDown = document.getElementById('govahi-offsetY-val-down');
         var sc = document.getElementById('govahi-scale-val');
         var wd = document.getElementById('govahi-width-val');
+
         if (ox) ox.textContent = settings.offsetX;
-        if (oy) oy.textContent = settings.offsetY;
+        if (oyTop) oyTop.textContent = settings.offsetY;
+        if (oyDown) oyDown.textContent = settings.offsetY;
         if (sc) sc.textContent = Math.round(settings.scale * 100) + '%';
         if (wd) wd.textContent = settings.widthOffset;
     }
@@ -62,27 +62,33 @@
         refresh();
     }
 
-    // ========== اتصال دکمه‌ها با منطق معکوس برای حس فارسی ==========
+    // ========== اتصال دکمه‌ها ==========
     function bindControls() {
-        // ---- عمودی (بالا/پایین) ----
-        document.getElementById('govahi-offsetY-up5')?.addEventListener('click', function() { settings.offsetY -= 5; refresh(); });
-        document.getElementById('govahi-offsetY-up')?.addEventListener('click', function() { settings.offsetY -= 1; refresh(); });
-        document.getElementById('govahi-offsetY-down')?.addEventListener('click', function() { settings.offsetY += 1; refresh(); });
-        document.getElementById('govahi-offsetY-down5')?.addEventListener('click', function() { settings.offsetY += 5; refresh(); });
+        // ---- ردیف بالا ----
+        document.getElementById('govahi-offsetY-up-dec5')?.addEventListener('click', function() { settings.offsetY -= 5; refresh(); });
+        document.getElementById('govahi-offsetY-up-dec')?.addEventListener('click', function() { settings.offsetY -= 1; refresh(); });
+        document.getElementById('govahi-offsetY-up-inc')?.addEventListener('click', function() { settings.offsetY += 1; refresh(); });
+        document.getElementById('govahi-offsetY-up-inc5')?.addEventListener('click', function() { settings.offsetY += 5; refresh(); });
 
-        // ---- افقی (راست/چپ) ----
-        document.getElementById('govahi-offsetX-right5')?.addEventListener('click', function() { settings.offsetX -= 5; refresh(); }); // "راست +" → حرکت به چپ
-        document.getElementById('govahi-offsetX-right')?.addEventListener('click', function() { settings.offsetX -= 1; refresh(); });
-        document.getElementById('govahi-offsetX-left')?.addEventListener('click', function() { settings.offsetX += 1; refresh(); });   // "راست -" → حرکت به راست
-        document.getElementById('govahi-offsetX-left5')?.addEventListener('click', function() { settings.offsetX += 5; refresh(); });
+        // ---- ردیف پایین (جهت معکوس: + یعنی برو پایین = offsetY افزایش) ----
+        document.getElementById('govahi-offsetY-down-dec5')?.addEventListener('click', function() { settings.offsetY -= 5; refresh(); });
+        document.getElementById('govahi-offsetY-down-dec')?.addEventListener('click', function() { settings.offsetY -= 1; refresh(); });
+        document.getElementById('govahi-offsetY-down-inc')?.addEventListener('click', function() { settings.offsetY += 1; refresh(); });
+        document.getElementById('govahi-offsetY-down-inc5')?.addEventListener('click', function() { settings.offsetY += 5; refresh(); });
 
-        // ---- پهنا (width) ----
-        document.getElementById('govahi-width-inc5')?.addEventListener('click', function() { settings.widthOffset += 5; refresh(); });
-        document.getElementById('govahi-width-inc')?.addEventListener('click', function() { settings.widthOffset += 1; refresh(); });
-        document.getElementById('govahi-width-dec')?.addEventListener('click', function() { settings.widthOffset -= 1; refresh(); });
+        // ---- ردیف راست (صحافی) ----
+        document.getElementById('govahi-offsetX-right-dec5')?.addEventListener('click', function() { settings.offsetX -= 5; refresh(); }); // + راست → فضای صحافی بیشتر
+        document.getElementById('govahi-offsetX-right-dec')?.addEventListener('click', function() { settings.offsetX -= 1; refresh(); });
+        document.getElementById('govahi-offsetX-right-inc')?.addEventListener('click', function() { settings.offsetX += 1; refresh(); });
+        document.getElementById('govahi-offsetX-right-inc5')?.addEventListener('click', function() { settings.offsetX += 5; refresh(); });
+
+        // ---- ردیف پهنا ----
         document.getElementById('govahi-width-dec5')?.addEventListener('click', function() { settings.widthOffset -= 5; refresh(); });
+        document.getElementById('govahi-width-dec')?.addEventListener('click', function() { settings.widthOffset -= 1; refresh(); });
+        document.getElementById('govahi-width-inc')?.addEventListener('click', function() { settings.widthOffset += 1; refresh(); });
+        document.getElementById('govahi-width-inc5')?.addEventListener('click', function() { settings.widthOffset += 5; refresh(); });
 
-        // ---- بزرگنمایی (Zoom) ----
+        // ---- بزرگنمایی ----
         document.getElementById('govahi-scale-out5')?.addEventListener('click', function() { settings.scale = Math.max(0.5, settings.scale - 0.05); refresh(); });
         document.getElementById('govahi-scale-out')?.addEventListener('click', function() { settings.scale = Math.max(0.5, settings.scale - 0.01); refresh(); });
         document.getElementById('govahi-scale-in')?.addEventListener('click', function() { settings.scale = Math.min(2, settings.scale + 0.01); refresh(); });
@@ -94,11 +100,9 @@
         updateDisplay();
     }
 
-    // ========== پایش DOM برای بازسازی Angular ==========
+    // ========== پایش DOM برای Angular ==========
     var observer = new MutationObserver(function() {
-        if (document.getElementById('print-content')) {
-            refresh();
-        }
+        if (document.getElementById('print-content')) refresh();
     });
     observer.observe(document.body, { childList: true, subtree: true });
 
@@ -110,5 +114,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (with widthOffset, arrow-style)');
+    console.log('✅ print-settings module loaded. (full controls with width)');
 })();
