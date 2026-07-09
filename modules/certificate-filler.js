@@ -1,7 +1,7 @@
 /**
  * ==========================================================
  * modules/certificate-filler.js
- * پرکنندهٔ خودکار شماره گواهینامه و تاریخ از API
+ * دکمهٔ «پر کردن گواهینامه‌ها» در پنل – دریافت از API
  * ==========================================================
  */
 (function () {
@@ -39,7 +39,7 @@
         localStorage.setItem(getCacheKey(code), JSON.stringify({ number: number, date: date }));
     }
 
-    // ========== ارسال درخواست به API ==========
+    // ========== درخواست به API ==========
     function fetchCertificateInfo(nationalCode) {
         var baseUrl = (GovahiApp.config && GovahiApp.config.apiUrl) || '';
         if (!baseUrl) return Promise.reject(new Error('آدرس API تنظیم نشده است.'));
@@ -78,7 +78,7 @@
             return;
         }
 
-        GovahiApp.ui.setStatus('⏳ در حال دریافت اطلاعات...');
+        GovahiApp.ui.setStatus('⏳ در حال دریافت اطلاعات از API...');
         var count = 0, cached = 0, fetched = 0, errors = 0;
         var promises = [];
 
@@ -91,7 +91,7 @@
             }
 
             var promise = Promise.resolve().then(function () {
-                // ۱. کش
+                // ۱. کش محلی
                 var cachedData = getFromCache(nationalCode);
                 if (cachedData) {
                     cached++;
@@ -150,14 +150,14 @@
                 btn.id = 'govahi-fill-btn';
                 btn.className = 'action-btn';
                 btn.textContent = '🔢 پر کردن گواهینامه‌ها';
-                btn.title = 'دریافت شماره گواهینامه و تاریخ از API و پر کردن کارت‌ها';
+                btn.title = 'دریافت شماره گواهینامه و تاریخ از API';
                 btn.style.backgroundColor = '#10b981';
 
                 btn.addEventListener('click', function () {
                     GovahiApp.fillCertificates();
                 });
 
-                // درج بعد از دکمه ارسال به API
+                // درج بعد از دکمهٔ «ارسال به API»
                 var sendBtn = document.getElementById('govahi-send-to-api-btn');
                 if (sendBtn) {
                     sendBtn.parentNode.insertBefore(btn, sendBtn.nextSibling);
@@ -165,11 +165,12 @@
                     actionSection.appendChild(btn);
                 }
 
-                console.log('✅ دکمه پر کردن گواهینامه‌ها به پنل اضافه شد.');
+                console.log('✅ دکمهٔ پر کردن گواهینامه‌ها به پنل اضافه شد.');
             }
         }, 300);
     }
 
+    // اجرای افزودن دکمه بعد از آماده‌سازی DOM
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', addButtonToPanel);
     } else {
