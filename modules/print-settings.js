@@ -10,7 +10,7 @@
         scale: 1,          // بزرگنمایی (۱ = ۱۰۰٪)
         widthOffset: 0,    // افزایش/کاهش عرض بر حسب پیکسل
         cardGap: 0,        // فاصلهٔ عمودی بین کارت‌ها (پیکسل)
-        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل)
+        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل) – از طریق column-gap
     };
 
     var baseWidth = null;
@@ -25,14 +25,14 @@
             baseWidth = target.getBoundingClientRect().width;
         }
 
-        // ۲. رفع محدودیت‌ها
+        // ۲. رفع محدودیت‌های ارتفاع، overflow و max-width
         target.style.setProperty('max-height', 'none', 'important');
-        target.style.setProperty('max-width', 'none', 'important');   // افزایش بدون محدودیت
+        target.style.setProperty('max-width', 'none', 'important');
         target.style.setProperty('overflow', 'visible', 'important');
         target.style.setProperty('margin', '0', 'important');
         target.style.setProperty('padding', '0', 'important');
 
-        // ۳. عرض
+        // ۳. اعمال عرض
         var newWidth = baseWidth + settings.widthOffset;
         target.style.setProperty('width', newWidth + 'px', 'important');
 
@@ -41,31 +41,36 @@
         target.style.setProperty('transform', transformValue, 'important');
         target.style.setProperty('transform-origin', 'top right', 'important');
 
-        // ۵. فاصلهٔ عمودی (margin-bottom)
+        // ۵. فاصلهٔ عمودی (margin-bottom) روی هر کارت
         var allCards = target.querySelectorAll('.col-md-6');
         allCards.forEach(function(card) {
             card.style.marginBottom = settings.cardGap + 'px';
         });
 
-        // ۶. فاصلهٔ افقی: بازنویسی کامل Flexbox Bootstrap
+        // ۶. فاصلهٔ افقی با Flexbox و column-gap
         var row = target.querySelector('.row.printt');
         if (row) {
-            // غیرفعال کردن Flex – استفاده از float اصلی
-            row.style.display = 'block';   // block، نه flex
+            // فعال‌سازی مجدد Flex (پیش‌فرض Bootstrap)
+            row.style.display = 'flex';
+            row.style.flexWrap = 'wrap';
+            row.style.columnGap = settings.cardGapH + 'px';   // فاصلهٔ افقی
+            row.style.rowGap = '0';                           // فاصلهٔ عمودی توسط margin کنترل می‌شود
 
-            allCards.forEach(function(card, index) {
-                if (settings.cardGapH > 0 && index % 2 === 1) {
-                    // کارت سمت چپ (ایندکس فرد)
-                    card.style.marginLeft = settings.cardGapH + 'px';
-                    card.style.width      = 'calc(50% - ' + settings.cardGapH + 'px)';
-                    card.style.maxWidth   = 'calc(50% - ' + settings.cardGapH + 'px)';
-                    card.style.flex       = '0 0 calc(50% - ' + settings.cardGapH + 'px)';
+            // محاسبه عرض جدید برای هر کارت
+            var newCardWidth = 'calc((100% - ' + settings.cardGapH + 'px) / 2)';
+
+            allCards.forEach(function(card) {
+                if (settings.cardGapH > 0) {
+                    card.style.width = newCardWidth;
+                    card.style.maxWidth = newCardWidth;
+                    card.style.flex = '0 0 ' + newCardWidth;
+                    card.style.marginLeft = '';   // حذف margin-left قبلی
                 } else {
-                    // کارت راست، یا حالت بدون فاصله
+                    // بازگشت به پیش‌فرض Bootstrap
+                    card.style.width = '';
+                    card.style.maxWidth = '';
+                    card.style.flex = '';
                     card.style.marginLeft = '';
-                    card.style.width      = '';
-                    card.style.maxWidth   = '';
-                    card.style.flex       = '';
                 }
             });
         }
@@ -142,7 +147,7 @@
         document.getElementById('govahi-cardGap-inc')?.addEventListener('click', function() { settings.cardGap += 1; refresh(); });
         document.getElementById('govahi-cardGap-inc5')?.addEventListener('click', function() { settings.cardGap += 5; refresh(); });
 
-        // ---- فاصلهٔ افقی ----
+        // ---- فاصلهٔ افقی (column-gap) ----
         document.getElementById('govahi-cardGapH-dec5')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 5); refresh(); });
         document.getElementById('govahi-cardGapH-dec')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 1); refresh(); });
         document.getElementById('govahi-cardGapH-inc')?.addEventListener('click', function() { settings.cardGapH += 1; refresh(); });
@@ -168,5 +173,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (flex overwrite fix)');
+    console.log('✅ print-settings module loaded. (column-gap, both cards shrink)');
 })();
