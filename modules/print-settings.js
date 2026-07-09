@@ -9,7 +9,8 @@
         offsetY: 0,        // جابه‌جایی عمودی (پیکسل)
         scale: 1,          // بزرگنمایی (۱ = ۱۰۰٪)
         widthOffset: 0,    // افزایش/کاهش عرض بر حسب پیکسل
-        cardGap: 0         // فاصلهٔ بین کارت‌های گواهینامه (پیکسل)
+        cardGap: 0,        // فاصلهٔ عمودی بین کارت‌ها (پیکسل)
+        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل) -- جدید
     };
 
     var baseWidth = null;
@@ -39,13 +40,19 @@
         target.style.setProperty('transform', transformValue, 'important');
         target.style.setProperty('transform-origin', 'top right', 'important');
 
-        // ۵. فاصلهٔ بین کارت‌ها
+        // ۵. فاصلهٔ عمودی بین کارت‌ها (margin-bottom)
         var cards = target.querySelectorAll('.col-md-6');
         cards.forEach(function(card) {
             card.style.marginBottom = settings.cardGap + 'px';
         });
 
-        // ۶. دکمهٔ چاپ (فوتر)
+        // ۶. فاصلهٔ افقی بین کارت‌ها (gap روی ردیف)
+        var row = target.querySelector('.row.printt');
+        if (row) {
+            row.style.gap = settings.cardGapH + 'px';
+        }
+
+        // ۷. دکمهٔ چاپ (فوتر)
         var modalContent = target.closest('.modal-content');
         if (modalContent) {
             var footer = modalContent.querySelector('.modal-footer');
@@ -66,12 +73,14 @@
         var sc = document.getElementById('govahi-scale-val');
         var wd = document.getElementById('govahi-width-val');
         var cg = document.getElementById('govahi-cardGap-val');
+        var ch = document.getElementById('govahi-cardGapH-val');
 
         if (ox) ox.textContent = settings.offsetX;
         if (oy) oy.textContent = settings.offsetY;
         if (sc) sc.textContent = Math.round(settings.scale * 100) + '%';
         if (wd) wd.textContent = settings.widthOffset;
         if (cg) cg.textContent = settings.cardGap;
+        if (ch) ch.textContent = settings.cardGapH;
     }
 
     function refresh() {
@@ -84,6 +93,7 @@
         settings.scale = 1;
         settings.widthOffset = 0;
         settings.cardGap = 0;
+        settings.cardGapH = 0;
         baseWidth = null;
         refresh();
     }
@@ -108,11 +118,17 @@
         document.getElementById('govahi-width-inc')?.addEventListener('click', function() { settings.widthOffset += 1; refresh(); });
         document.getElementById('govahi-width-inc5')?.addEventListener('click', function() { settings.widthOffset += 5; refresh(); });
 
-        // ---- فاصلهٔ کارت‌ها (cardGap) ----
+        // ---- فاصلهٔ عمودی (cardGap) ----
         document.getElementById('govahi-cardGap-dec5')?.addEventListener('click', function() { settings.cardGap -= 5; refresh(); });
         document.getElementById('govahi-cardGap-dec')?.addEventListener('click', function() { settings.cardGap -= 1; refresh(); });
         document.getElementById('govahi-cardGap-inc')?.addEventListener('click', function() { settings.cardGap += 1; refresh(); });
         document.getElementById('govahi-cardGap-inc5')?.addEventListener('click', function() { settings.cardGap += 5; refresh(); });
+
+        // ---- فاصلهٔ افقی (cardGapH) ----
+        document.getElementById('govahi-cardGapH-dec5')?.addEventListener('click', function() { settings.cardGapH -= 5; refresh(); });
+        document.getElementById('govahi-cardGapH-dec')?.addEventListener('click', function() { settings.cardGapH -= 1; refresh(); });
+        document.getElementById('govahi-cardGapH-inc')?.addEventListener('click', function() { settings.cardGapH += 1; refresh(); });
+        document.getElementById('govahi-cardGapH-inc5')?.addEventListener('click', function() { settings.cardGapH += 5; refresh(); });
 
         // ---- بزرگنمایی ----
         document.getElementById('govahi-scale-out5')?.addEventListener('click', function() { settings.scale = Math.max(0.5, settings.scale - 0.05); refresh(); });
@@ -134,5 +150,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (cardGap added)');
+    console.log('✅ print-settings module loaded. (card gap horizontal added)');
 })();
