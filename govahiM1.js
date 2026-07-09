@@ -14,13 +14,12 @@
 
     window.GovahiApp = window.GovahiApp || {};
 
-    // ترتیب بارگذاری: local-assigner قبل از certificate-filler
     var modules = [
         '/modules/config.js',
         '/modules/extractor.js',
         '/modules/ui-panel.js',
         '/modules/api-handler.js',
-        '/modules/local-assigner.js',   // جدید
+        '/modules/local-assigner.js',
         '/modules/certificate-filler.js'
     ];
 
@@ -36,7 +35,6 @@
 
     function loadModulesSequentially(index) {
         if (index >= modules.length) {
-            // همه ماژول‌ها بارگذاری شدند
             if (typeof GovahiApp.extractor === 'undefined' ||
                 typeof GovahiApp.ui === 'undefined' ||
                 typeof GovahiApp.apiHandler === 'undefined' ||
@@ -53,13 +51,88 @@
                 return GovahiApp.config.apiUrl;
             };
 
-            // مخفی کردن فیلد آدرس (در صورت وجود)
             var apiInput = document.getElementById('api-url-input');
             if (apiInput) {
                 apiInput.style.display = 'none';
             }
 
-            // ---------- تنظیم ارسال به API (همانند قبل) ----------
+            // ---------- تابع تشخیص صفحه ----------
+            function isOnListPage() {
+                return document.querySelectorAll('.modal-body tbody tr').length > 0;
+            }
+
+            function isOnCertificatePage() {
+                return document.querySelectorAll('#print-content .col-md-6').length > 0;
+            }
+
+            // به‌روزرسانی وضعیت دکمه‌ها بر اساس صفحهٔ جاری
+            function updateButtonStates() {
+                if (isOnCertificatePage()) {
+                    // در صفحه گواهینامه: دکمه‌های استخراج و اختصاص غیرفعال
+                    GovahiApp.ui.setExtractEnabled(false);
+                    GovahiApp.ui.setAssignEnabled(false);
+                } else {
+                    // در صفحه لیست: فعال (ارسال به سنجش هم طبق روال عادی بعداً تنظیم می‌شود)
+                    GovahiApp.ui.setExtractEnabled(true);
+                    GovahiApp.ui.setAssignEnabled(true);
+                }
+            }
+
+            // ---------- رویداد استخراج ----------
+            GovahiApp.ui.onExtract(function() {
+                if (!isOnListPage()) {
+                    GovahiApp.ui.setStatus('⚠️ این عملیات فقط در صفحهٔ لیست فارغ‌التحصیلان قابل انجام است.');
+                    return;
+                }
+
+                var header = GovahiApp.extractor.extractHeader();
+                var students = GovahiApp.extractor.extractStudents();
+                window.extractedData = { header: header, students: students };
+                GovahiApp.extractor.highlightRows();
+
+                var regionCode = header['کد_منطقه'] || header['region_code'] || '';
+                var authorized = GovahiApp.config.authorizedRegions;
+
+                if (authorized.indexOf(regionCode) !== -1) {
+                    GovahiApp.isRegionAuthorized = true;
+                    GovahiApp.ui.enableSendButton();
+                    GovahiApp.ui.hideManualInput();
+                    GovahiApp.ui.setStatus('✅ اطلاعات استخراج و ذخیره شد. منطقه مجاز می‌باشد.');
+                } else {
+                    GovahiApp.isRegionAuthorized = false;
+                    GovahiApp.ui.disableSendButton();
+                    GovahiApp.ui.showManualInput();
+                    GovahiApp.ui.setStatus('⚠️ خدمات در منطقهٔ شما تقاضا نشده است. لطفاً شمارهٔ شروع و تاریخ را وارد کرده و سپس اختصاص دهید.');
+                }
+
+                console.log('Extracted Data:', window.extractedData);
+            });
+
+            // ---------- دکمهٔ اختصاص محلی ----------
+            document.getElementById('govahi-assign-local-btn').addEventListener('click', function() {
+                if (!isOnListPage()) {
+                    GovahiApp.ui.setStatus('⚠️ این عملیات فقط در صفحهٔ لیست فارغ‌التحصیلان قابل انجام است.');
+                    return;
+                }
+
+                var startNumber = parseInt(document.getElementById('govahi-start-number').value, 10);
+                var issueDate = document.getElementById('govahi-issue-date').value.trim();
+
+                if (!startNumber || !issueDate) {
+                    alert('لطفاً شماره شروع و تاریخ را وارد کنید.');
+                    return;
+                }
+
+                if (!window.extractedData || !window.extractedData.students) {
+                    alert('ابتدا اطلاعات را استخراج کنید.');
+                    return;
+                }
+
+                GovahiApp.localAssigner.assign(startNumber, issueDate);
+                GovahiApp.ui.setStatus('✅ شماره گواهینامه‌ها با موفقیت اختصاص یافت.');
+            });
+
+            // ---------- ارسال به API (همانند قبل) ----------
             GovahiApp.apiHandler.send = function(data) {
                 var url = GovahiApp.ui.getApiUrl();
                 if (!url) {
@@ -117,51 +190,6 @@
                 });
             };
 
-            // ---------- رویداد استخراج (با بررسی منطقه) ----------
-            GovahiApp.ui.onExtract(function() {
-                var header = GovahiApp.extractor.extractHeader();
-                var students = GovahiApp.extractor.extractStudents();
-                window.extractedData = { header: header, students: students };
-                GovahiApp.extractor.highlightRows();
-
-                var regionCode = header['کد_منطقه'] || header['region_code'] || '';
-                var authorized = GovahiApp.config.authorizedRegions;
-
-                if (authorized.indexOf(regionCode) !== -1) {
-                    GovahiApp.isRegionAuthorized = true;
-                    GovahiApp.ui.enableSendButton();
-                    GovahiApp.ui.hideManualInput();
-                    GovahiApp.ui.setStatus('✅ اطلاعات استخراج و ذخیره شد. منطقه مجاز می‌باشد.');
-                } else {
-                    GovahiApp.isRegionAuthorized = false;
-                    GovahiApp.ui.disableSendButton();
-                    GovahiApp.ui.showManualInput();
-                    GovahiApp.ui.setStatus('⚠️ کد منطقه غیرمجاز. لطفاً شماره شروع و تاریخ را وارد کرده و سپس اختصاص دهید.');
-                }
-
-                console.log('Extracted Data:', window.extractedData);
-            });
-
-            // ---------- دکمهٔ اختصاص محلی ----------
-            document.getElementById('govahi-assign-local-btn').addEventListener('click', function() {
-                var startNumber = parseInt(document.getElementById('govahi-start-number').value, 10);
-                var issueDate = document.getElementById('govahi-issue-date').value.trim();
-
-                if (!startNumber || !issueDate) {
-                    alert('لطفاً شماره شروع و تاریخ را وارد کنید.');
-                    return;
-                }
-
-                if (!window.extractedData || !window.extractedData.students) {
-                    alert('ابتدا اطلاعات را استخراج کنید.');
-                    return;
-                }
-
-                GovahiApp.localAssigner.assign(startNumber, issueDate);
-                GovahiApp.ui.setStatus('✅ شماره گواهینامه‌ها با موفقیت اختصاص یافت.');
-            });
-
-            // ---------- رویداد ارسال (همانند قبل) ----------
             GovahiApp.ui.onSend(function() {
                 if (!window.extractedData) {
                     alert('ابتدا اطلاعات را استخراج کنید.');
@@ -169,6 +197,20 @@
                 }
                 GovahiApp.apiHandler.send(window.extractedData);
             });
+
+            // تنظیم اولیه وضعیت دکمه‌ها
+            updateButtonStates();
+
+            // در صورت تغییر صفحه (مثلاً با AJAX) می‌توان با MutationObserver بازبینی کرد،
+            // ولی برای سادگی می‌توان هر بار که پنل باز می‌شود وضعیت را چک کرد.
+            // با کلیک روی دکمه شناور وضعیت دوباره بررسی شود.
+            var originalToggle = GovahiApp.ui.togglePanel;
+            GovahiApp.ui.togglePanel = function() {
+                originalToggle();
+                if (panel.style.display === 'block') { // اگر پنل باز شد
+                    updateButtonStates();
+                }
+            };
 
             console.log('GovahiApp ready. استفاده از دکمه شناور برای شروع.');
             return;
