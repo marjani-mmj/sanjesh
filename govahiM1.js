@@ -16,6 +16,7 @@
 
     var modules = [
         '/modules/config.js',
+        '/modules/print-settings.js',
         '/modules/extractor.js',
         '/modules/ui-panel.js',
         '/modules/api-handler.js',
