@@ -161,15 +161,6 @@
                     <button class="ctrl-btn" id="govahi-offsetY-up-inc">+</button>
                     <button class="ctrl-btn coarse-inc" id="govahi-offsetY-up-inc5">+۵</button>
                 </div>
-                <!-- ردیف پایین -->
-                <div class="row-control">
-                    <span class="label">پایین</span>
-                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-down-dec5">−۵</button>
-                    <button class="ctrl-btn" id="govahi-offsetY-down-dec">−</button>
-                    <span class="value-display" id="govahi-offsetY-val-down">0</span>
-                    <button class="ctrl-btn" id="govahi-offsetY-down-inc">+</button>
-                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-down-inc5">+۵</button>
-                </div>
                 <!-- ردیف راست (صحافی) -->
                 <div class="row-control">
                     <span class="label">راست</span>
@@ -337,5 +328,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (clean +/- style, width row)');
+    console.log('Govahi UI Panel ready. (bottom row completely removed)');
 })();
