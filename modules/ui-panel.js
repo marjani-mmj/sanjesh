@@ -145,39 +145,57 @@
             <span class="close-btn" id="govahi-close-btn">&times;</span>
         </div>
         <div class="panel-body">
-            <!-- بخش تنظیمات چاپ (جمع‌شو) با onclick inline -->
+            <!-- بخش تنظیمات چاپ (جمع‌شو) -->
             <div class="collapsible-header collapsed" id="govahi-print-settings-toggle"
-                 onclick="var content=document.getElementById('govahi-print-settings-content'); content.classList.toggle('collapsed'); this.classList.toggle('collapsed');">
+                 onclick="var c=document.getElementById('govahi-print-settings-content');c.classList.toggle('collapsed');this.classList.toggle('collapsed');">
                 <span>📏 حاشیه‌ها و بزرگنمایی</span>
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="collapsible-content collapsed" id="govahi-print-settings-content">
-                <!-- عمودی -->
+                <!-- بالا -->
                 <div class="row-control">
-                    <span class="label">↕️ عمودی</span>
-                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-up5">▲5</button>
-                    <button class="ctrl-btn" id="govahi-offsetY-up">▲</button>
+                    <span class="label">بالا</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-up5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetY-up">−</button>
                     <span class="value-display" id="govahi-offsetY-val">0</span>
-                    <button class="ctrl-btn" id="govahi-offsetY-down">▼</button>
-                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-down5">▼5</button>
+                    <button class="ctrl-btn" id="govahi-offsetY-down">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-down5">+۵</button>
                 </div>
-                <!-- افقی -->
+                <!-- پایین -->
                 <div class="row-control">
-                    <span class="label">↔️ افقی</span>
-                    <button class="ctrl-btn coarse-dec" id="govahi-offsetX-left5">◄5</button>
-                    <button class="ctrl-btn" id="govahi-offsetX-left">◄</button>
+                    <span class="label">پایین</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-down5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetY-down">−</button>
+                    <span class="value-display">-</span>
+                    <button class="ctrl-btn" id="govahi-offsetY-up">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-up5">+۵</button>
+                </div>
+                <!-- راست (صحافی) -->
+                <div class="row-control">
+                    <span class="label">راست</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-offsetX-right5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetX-right">−</button>
                     <span class="value-display" id="govahi-offsetX-val">0</span>
-                    <button class="ctrl-btn" id="govahi-offsetX-right">►</button>
-                    <button class="ctrl-btn coarse-inc" id="govahi-offsetX-right5">►5</button>
+                    <button class="ctrl-btn" id="govahi-offsetX-left">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-offsetX-left5">+۵</button>
                 </div>
-                <!-- بزرگنمایی -->
+                <!-- پهنا -->
                 <div class="row-control">
-                    <span class="label">🔍 Zoom</span>
-                    <button class="ctrl-btn coarse-dec" id="govahi-scale-out5">−5%</button>
+                    <span class="label">پهنا</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-width-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-width-dec">−</button>
+                    <span class="value-display" id="govahi-width-val">0</span>
+                    <button class="ctrl-btn" id="govahi-width-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-width-inc5">+۵</button>
+                </div>
+                <!-- Zoom -->
+                <div class="row-control">
+                    <span class="label">Zoom</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-scale-out5">−۵</button>
                     <button class="ctrl-btn" id="govahi-scale-out">−</button>
                     <span class="value-display zoom-display" id="govahi-scale-val">100%</span>
                     <button class="ctrl-btn" id="govahi-scale-in">+</button>
-                    <button class="ctrl-btn coarse-inc" id="govahi-scale-in5">+5%</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-scale-in5">+۵</button>
                 </div>
                 <button class="apply-btn" id="govahi-reset-settings-btn" style="background:#6c757d;">↺ تنظیم مجدد</button>
             </div>
@@ -266,7 +284,7 @@
         });
     })();
 
-    // ========== اتصال کنترل‌های چاپ از ماژول print-settings ==========
+    // ========== اتصال کنترل‌های چاپ ==========
     if (GovahiApp.printSettings && typeof GovahiApp.printSettings.bindControls === 'function') {
         GovahiApp.printSettings.bindControls();
     } else {
@@ -319,5 +337,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (inline onclick for collapsible)');
+    console.log('Govahi UI Panel ready. (old-style buttons, width control restored)');
 })();
