@@ -1,209 +1,330 @@
-// modules/print-settings.js
-(function () {
+// C:\Users\manager\Desktop\sida cod\govahiM1\modules\ui-panel.js
+(function() {
     'use strict';
-
     window.GovahiApp = window.GovahiApp || {};
 
-    var spacing = {
-        moveX: 0,      // حرکت افقی
-        moveY: 0,      // حرکت عمودی
-        zoom: 100      // درصد
-    };
+    // ========== استایل‌ها ==========
+    var style = document.createElement('style');
+    style.textContent = `
+        #govahi-panel {
+            position: fixed; top: 100px; left: 20px; width: 300px;
+            background: #fff; border: 1px solid #ddd; border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 100000;
+            font-family: Tahoma, sans-serif; font-size: 13px;
+            display: none; user-select: none;
+        }
+        #govahi-panel .panel-header {
+            cursor: move; background: #f8f9fa;
+            padding: 6px 30px 6px 10px;
+            margin: -1px -1px 10px -1px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold; color: #333;
+            border-bottom: 1px solid #dee2e6;
+            position: relative;
+        }
+        #govahi-panel .panel-header .close-btn {
+            position: absolute; top: 4px; right: 8px;
+            font-size: 18px; font-weight: bold; color: #888;
+            cursor: pointer; line-height: 1;
+        }
+        #govahi-panel .panel-body { padding: 10px 12px 12px; }
+        #govahi-panel .section-title { font-weight: bold; color: #495057; margin-bottom: 5px; }
+        #govahi-panel .row-control { display: flex; align-items: center; margin-bottom: 6px; }
+        #govahi-panel .row-control .label { width: 45px; text-align: right; margin-left: 5px; font-weight: bold; color: #495057; }
+        #govahi-panel button.ctrl-btn {
+            width: 28px; height: 28px; font-size: 16px; font-weight: bold;
+            line-height: 1; margin: 0 2px; background: #e9ecef;
+            border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; color: #495057;
+        }
+        #govahi-panel button.ctrl-btn.coarse-dec { background: #ffc9c9; border-color: #ff8787; color: #c92a2a; }
+        #govahi-panel button.ctrl-btn.coarse-inc { background: #b2f2bb; border-color: #51cf66; color: #2b8a3e; }
+        #govahi-panel .value-display { width: 36px; text-align: center; font-weight: bold; font-size: 14px; color: #0050ef; }
+        #govahi-panel .zoom-display { width: 45px; }
 
-    function getTarget() {
-        return document.querySelector("#print-content .panel-body-print")
-            || document.getElementById("print-content");
-    }
-
-    function applySettings() {
-
-        var target = getTarget();
-
-        if (!target) {
-            console.warn("print-content پیدا نشد.");
-            return;
+        /* قاب جمع‌شو */
+        #govahi-panel .collapsible-header {
+            background: #f1f3f5;
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 6px;
+            user-select: none;
+        }
+        #govahi-panel .collapsible-header .toggle-icon {
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        #govahi-panel .collapsible-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        #govahi-panel .collapsible-content {
+            padding: 0 0 4px 0;
+        }
+        #govahi-panel .collapsible-content.collapsed {
+            display: none;
         }
 
-        target.style.setProperty("max-height","none","important");
-        target.style.setProperty("overflow","visible","important");
+        /* ورودی‌های همیشگی */
+        #govahi-panel .manual-fields {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ccc;
+        }
+        #govahi-panel .manual-fields .row-control {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+        }
+        #govahi-panel .manual-fields .row-control .label {
+            width: auto;
+            margin-left: 0;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+        #govahi-panel .manual-fields input {
+            width: 80px;
+            padding: 2px 4px;
+            margin: 0 4px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 12px;
+        }
 
-        target.style.setProperty(
-            "transform",
-            "translate(" +
-            spacing.moveX + "px," +
-            spacing.moveY + "px) scale(" +
-            (spacing.zoom/100) +
-            ")",
-            "important"
-        );
+        #govahi-panel .status { font-size: 12px; color: #28a745; margin-top: 5px; text-align: center; }
 
-        target.style.setProperty(
-            "transform-origin",
-            "top right",
-            "important"
-        );
+        /* دکمه‌های عملیات */
+        #govahi-panel .action-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        #govahi-panel .action-row .action-btn {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        #govahi-panel button.action-btn {
+            width: 100%; padding: 6px; margin-bottom: 6px;
+            background: #007bff; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+        #govahi-panel button.action-btn:disabled { background: #6c757d; cursor: not-allowed; }
+
+        #govahi-floating-toggle {
+            position: fixed; bottom: 20px; left: 20px;
+            z-index: 999999; width: 48px; height: 48px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 26px; color: white; cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            user-select: none; transition: transform 0.2s;
+        }
+        #govahi-floating-toggle:hover { transform: scale(1.1); }
+    `;
+    document.head.appendChild(style);
+
+    // ========== دکمه شناور ==========
+    var toggleIcon = document.createElement('div');
+    toggleIcon.id = 'govahi-floating-toggle';
+    toggleIcon.innerHTML = '⚙️';
+    toggleIcon.title = 'تنظیمات چاپ و گواهینامه';
+    document.body.appendChild(toggleIcon);
+
+    // ========== پنل ==========
+    var panel = document.createElement('div');
+    panel.id = 'govahi-panel';
+    panel.innerHTML = `
+        <div class="panel-header" id="govahi-panel-header">
+            <span>تنظیمات گواهینامه</span>
+            <span class="close-btn" id="govahi-close-btn">&times;</span>
+        </div>
+        <div class="panel-body">
+            <!-- بخش تنظیمات چاپ (جمع‌شو) -->
+            <div class="collapsible-header collapsed" id="govahi-print-settings-toggle">
+                <span>📏 تنظیمات چاپ</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="collapsible-content collapsed" id="govahi-print-settings-content">
+                <!-- جابه‌جایی عمودی (بالا/پایین) -->
+                <div class="row-control">
+                    <span class="label">↕️ عمودی</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetY-dec">−</button>
+                    <span class="value-display" id="govahi-offsetY-val">0</span>
+                    <button class="ctrl-btn" id="govahi-offsetY-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-inc5">+۵</button>
+                </div>
+                <!-- جابه‌جایی افقی (راست/چپ) -->
+                <div class="row-control">
+                    <span class="label">↔️ افقی</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-offsetX-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetX-dec">−</button>
+                    <span class="value-display" id="govahi-offsetX-val">0</span>
+                    <button class="ctrl-btn" id="govahi-offsetX-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-offsetX-inc5">+۵</button>
+                </div>
+                <!-- بزرگنمایی -->
+                <div class="row-control">
+                    <span class="label">🔍 Zoom</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-scale-dec5">−۵٪</button>
+                    <button class="ctrl-btn" id="govahi-scale-dec">−</button>
+                    <span class="value-display zoom-display" id="govahi-scale-val">100%</span>
+                    <button class="ctrl-btn" id="govahi-scale-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-scale-inc5">+۵٪</button>
+                </div>
+                <button class="apply-btn" id="govahi-reset-settings-btn" style="background:#6c757d;">↺ تنظیم مجدد</button>
+            </div>
+
+            <!-- ورودی‌های شماره شروع و تاریخ (در یک ردیف) -->
+            <div class="manual-fields">
+                <div class="row-control">
+                    <span class="label">شماره شروع:</span>
+                    <input type="number" id="govahi-start-number" min="1" value="1" />
+                    <span class="label" style="margin-right:10px;">تاریخ:</span>
+                    <input type="text" id="govahi-issue-date" placeholder="روز/ماه/سال" style="direction: rtl; text-align: right; width:90px;" />
+                </div>
+            </div>
+
+            <div class="separator"></div>
+
+            <!-- بخش عملیات گواهینامه -->
+            <div class="section-title">📋 عملیات گواهینامه</div>
+            <div class="action-row" id="govahi-action-row">
+                <button class="action-btn" id="govahi-extract-btn">📋 شناسایی</button>
+                <button class="action-btn" id="govahi-send-to-api-btn" disabled>📤 ارسال به سنجش</button>
+            </div>
+
+            <!-- دکمه تخصیص محلی (نمایش بر اساس مجوز) -->
+            <div id="govahi-manual-section" style="display:none;">
+                <button class="action-btn" id="govahi-assign-local-btn" style="background:#e67e22;">📝 اختصاص شماره</button>
+            </div>
+
+            <div class="status" id="govahi-status-msg"></div>
+
+            <div style="margin-top:10px; text-align:center; font-size:11px; color:#adb5bd;">
+                آموزش و پرورش خلیل آباد<br>کارشناسی سنجش
+            </div>
+        </div>
+    `;
+    document.body.appendChild(panel);
+
+    // ========== نمایش / مخفی ==========
+    var isPanelVisible = false;
+    toggleIcon.addEventListener('click', function() {
+        if (isPanelVisible) {
+            panel.style.display = 'none';
+            toggleIcon.innerHTML = '⚙️';
+        } else {
+            panel.style.display = 'block';
+            toggleIcon.innerHTML = '🔧';
+        }
+        isPanelVisible = !isPanelVisible;
+    });
+
+    document.getElementById('govahi-close-btn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        panel.style.display = 'none';
+        toggleIcon.innerHTML = '⚙️';
+        isPanelVisible = false;
+    });
+
+    // ========== قابلیت درگ ==========
+    (function() {
+        var header = document.getElementById('govahi-panel-header');
+        var dragging = false, startX, startY, initialLeft, initialTop;
+
+        header.addEventListener('mousedown', function(e) {
+            if (e.target.id === 'govahi-close-btn') return;
+            e.preventDefault();
+            dragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            var rect = panel.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            panel.style.transition = 'none';
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!dragging) return;
+            e.preventDefault();
+            panel.style.left = (initialLeft + e.clientX - startX) + 'px';
+            panel.style.top = (initialTop + e.clientY - startY) + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (dragging) {
+                dragging = false;
+                panel.style.transition = '';
+            }
+        });
+    })();
+
+    // ========== باز و بسته شدن تنظیمات چاپ ==========
+    var printSettingsToggle = document.getElementById('govahi-print-settings-toggle');
+    var printSettingsContent = document.getElementById('govahi-print-settings-content');
+    printSettingsToggle.addEventListener('click', function() {
+        var isCollapsed = printSettingsContent.classList.toggle('collapsed');
+        printSettingsToggle.classList.toggle('collapsed', isCollapsed);
+    });
+
+    // ========== اتصال کنترل‌های چاپ از ماژول print-settings ==========
+    if (GovahiApp.printSettings && typeof GovahiApp.printSettings.bindControls === 'function') {
+        GovahiApp.printSettings.bindControls();
+    } else {
+        console.warn('ui-panel: printSettings ماژول بارگذاری نشده است. کنترل‌های چاپ غیرفعال می‌مانند.');
     }
 
-    function updateDisplay(){
-
-        var top=document.getElementById("govahi-marginTopVal");
-        var bottom=document.getElementById("govahi-marginBottomVal");
-        var right=document.getElementById("govahi-marginRightVal");
-        var zoom=document.getElementById("govahi-zoomVal");
-
-        if(top) top.textContent=spacing.moveY;
-        if(bottom) bottom.textContent=-spacing.moveY;
-        if(right) right.textContent=spacing.moveX;
-        if(zoom) zoom.textContent=spacing.zoom+"%";
-    }
-
-    function refresh(){
-
-        applySettings();
-        updateDisplay();
-
-    }
-
-    function bindControls(){
-
-        //---------------- بالا ----------------
-
-        document.getElementById("govahi-marginTopInc")?.addEventListener("click",function(){
-
-            spacing.moveY-=1;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginTopDec")?.addEventListener("click",function(){
-
-            spacing.moveY+=1;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginTopInc5")?.addEventListener("click",function(){
-
-            spacing.moveY-=5;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginTopDec5")?.addEventListener("click",function(){
-
-            spacing.moveY+=5;
-            refresh();
-
-        });
-
-        //---------------- پایین ----------------
-
-        document.getElementById("govahi-marginBottomInc")?.addEventListener("click",function(){
-
-            spacing.moveY+=1;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginBottomDec")?.addEventListener("click",function(){
-
-            spacing.moveY-=1;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginBottomInc5")?.addEventListener("click",function(){
-
-            spacing.moveY+=5;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginBottomDec5")?.addEventListener("click",function(){
-
-            spacing.moveY-=5;
-            refresh();
-
-        });
-
-        //---------------- راست ----------------
-
-        document.getElementById("govahi-marginRightInc")?.addEventListener("click",function(){
-
-            spacing.moveX-=1;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginRightDec")?.addEventListener("click",function(){
-
-            spacing.moveX+=1;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginRightInc5")?.addEventListener("click",function(){
-
-            spacing.moveX-=5;
-            refresh();
-
-        });
-
-        document.getElementById("govahi-marginRightDec5")?.addEventListener("click",function(){
-
-            spacing.moveX+=5;
-            refresh();
-
-        });
-
-        //---------------- زوم ----------------
-
-        document.getElementById("govahi-zoomInc")?.addEventListener("click",function(){
-
-            spacing.zoom=Math.min(200,spacing.zoom+1);
-            refresh();
-
-        });
-
-        document.getElementById("govahi-zoomDec")?.addEventListener("click",function(){
-
-            spacing.zoom=Math.max(30,spacing.zoom-1);
-            refresh();
-
-        });
-
-        document.getElementById("govahi-zoomInc5")?.addEventListener("click",function(){
-
-            spacing.zoom=Math.min(200,spacing.zoom+5);
-            refresh();
-
-        });
-
-        document.getElementById("govahi-zoomDec5")?.addEventListener("click",function(){
-
-            spacing.zoom=Math.max(30,spacing.zoom-5);
-            refresh();
-
-        });
-
-        //---------------- اعمال ----------------
-
-        document.getElementById("govahi-applySettingsBtn")
-        ?.addEventListener("click",refresh);
-
-        updateDisplay();
-    }
-
-    // هنگام چاپ دوباره اعمال شود
-    window.addEventListener("beforeprint",applySettings);
-
-    GovahiApp.printSettings={
-
-        spacing:spacing,
-        applySettings:applySettings,
-        bindControls:bindControls,
-        updateDisplay:updateDisplay
-
+    // ========== API عمومی برای سایر ماژول‌ها ==========
+    GovahiApp.ui = {
+        togglePanel: function() {
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                toggleIcon.innerHTML = '🔧';
+                isPanelVisible = true;
+            } else {
+                panel.style.display = 'none';
+                toggleIcon.innerHTML = '⚙️';
+                isPanelVisible = false;
+            }
+        },
+        setStatus: function(msg) {
+            document.getElementById('govahi-status-msg').textContent = msg;
+        },
+        getApiUrl: function() {
+            return GovahiApp.config && GovahiApp.config.apiUrl ? GovahiApp.config.apiUrl : '';
+        },
+        enableSendButton: function() {
+            document.getElementById('govahi-send-to-api-btn').disabled = false;
+        },
+        disableSendButton: function() {
+            document.getElementById('govahi-send-to-api-btn').disabled = true;
+        },
+        showManualInput: function() {
+            document.getElementById('govahi-manual-section').style.display = 'block';
+        },
+        hideManualInput: function() {
+            document.getElementById('govahi-manual-section').style.display = 'none';
+        },
+        onExtract: function(cb) {
+            document.getElementById('govahi-extract-btn').onclick = cb;
+        },
+        onSend: function(cb) {
+            document.getElementById('govahi-send-to-api-btn').onclick = cb;
+        },
+        setExtractEnabled: function(enabled) {
+            document.getElementById('govahi-extract-btn').disabled = !enabled;
+        },
+        setAssignEnabled: function(enabled) {
+            var assignBtn = document.getElementById('govahi-assign-local-btn');
+            if (assignBtn) assignBtn.disabled = !enabled;
+        }
     };
 
+    console.log('Govahi UI Panel ready. (transform-based layout)');
 })();
