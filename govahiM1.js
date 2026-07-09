@@ -56,7 +56,7 @@
                 apiInput.style.display = 'none';
             }
 
-            // ---------- تابع تشخیص صفحه ----------
+            // ---------- ابزار تشخیص صفحه ----------
             function isOnListPage() {
                 return document.querySelectorAll('.modal-body tbody tr').length > 0;
             }
@@ -65,18 +65,42 @@
                 return document.querySelectorAll('#print-content .col-md-6').length > 0;
             }
 
-            // به‌روزرسانی وضعیت دکمه‌ها بر اساس صفحهٔ جاری
+            // ---------- بروزرسانی وضعیت دکمه‌ها ----------
             function updateButtonStates() {
                 if (isOnCertificatePage()) {
-                    // در صفحه گواهینامه: دکمه‌های استخراج و اختصاص غیرفعال
+                    // صفحهٔ گواهینامه: دکمه‌های شناسایی و اختصاص غیرفعال + مخفی کردن بخش دستی
                     GovahiApp.ui.setExtractEnabled(false);
                     GovahiApp.ui.setAssignEnabled(false);
+                    GovahiApp.ui.hideManualInput();        // مخفی کردن دکمه اختصاص
+                    GovahiApp.ui.disableSendButton();      // ارسال به سنجش هم غیرفعال (منطقی)
                 } else {
-                    // در صفحه لیست: فعال (ارسال به سنجش هم طبق روال عادی بعداً تنظیم می‌شود)
+                    // صفحهٔ لیست: فعال‌سازی اولیه
                     GovahiApp.ui.setExtractEnabled(true);
-                    GovahiApp.ui.setAssignEnabled(true);
+                    // وضعیت اختصاص/ارسال بستگی به مجوز منطقه دارد؛ با کلیک روی شناسایی مشخص می‌شود
+                    // اما اگر قبلاً استخراج انجام شده، می‌تواند وضعیت دکمه‌ها را نگه دارد.
+                    // اینجا دکمهٔ اختصاص را فعلاً فعال می‌گذاریم (در صورتی که بخش دستی نمایش داده شده باشد فعال است)
+                    if (GovahiApp.isRegionAuthorized !== undefined) {
+                        if (GovahiApp.isRegionAuthorized) {
+                            GovahiApp.ui.enableSendButton();
+                            GovahiApp.ui.hideManualInput();
+                        } else {
+                            GovahiApp.ui.disableSendButton();
+                            GovahiApp.ui.showManualInput();
+                            GovahiApp.ui.setAssignEnabled(true);
+                        }
+                    } else {
+                        // هنوز استخراج نشده: دکمه ارسال غیرفعال، بخش دستی مخفی
+                        GovahiApp.ui.disableSendButton();
+                        GovahiApp.ui.hideManualInput();
+                    }
                 }
             }
+
+            // ---------- پایش تغییرات صفحه با MutationObserver ----------
+            var observer = new MutationObserver(function() {
+                updateButtonStates();
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
 
             // ---------- رویداد استخراج ----------
             GovahiApp.ui.onExtract(function() {
@@ -102,6 +126,7 @@
                     GovahiApp.isRegionAuthorized = false;
                     GovahiApp.ui.disableSendButton();
                     GovahiApp.ui.showManualInput();
+                    GovahiApp.ui.setAssignEnabled(true);
                     GovahiApp.ui.setStatus('⚠️ خدمات در منطقهٔ شما تقاضا نشده است. لطفاً شمارهٔ شروع و تاریخ را وارد کرده و سپس اختصاص دهید.');
                 }
 
@@ -132,7 +157,7 @@
                 GovahiApp.ui.setStatus('✅ شماره گواهینامه‌ها با موفقیت اختصاص یافت.');
             });
 
-            // ---------- ارسال به API (همانند قبل) ----------
+            // ---------- ارسال به API ----------
             GovahiApp.apiHandler.send = function(data) {
                 var url = GovahiApp.ui.getApiUrl();
                 if (!url) {
@@ -200,17 +225,6 @@
 
             // تنظیم اولیه وضعیت دکمه‌ها
             updateButtonStates();
-
-            // در صورت تغییر صفحه (مثلاً با AJAX) می‌توان با MutationObserver بازبینی کرد،
-            // ولی برای سادگی می‌توان هر بار که پنل باز می‌شود وضعیت را چک کرد.
-            // با کلیک روی دکمه شناور وضعیت دوباره بررسی شود.
-            var originalToggle = GovahiApp.ui.togglePanel;
-            GovahiApp.ui.togglePanel = function() {
-                originalToggle();
-                if (panel.style.display === 'block') { // اگر پنل باز شد
-                    updateButtonStates();
-                }
-            };
 
             console.log('GovahiApp ready. استفاده از دکمه شناور برای شروع.');
             return;
