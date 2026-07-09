@@ -152,34 +152,34 @@
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="collapsible-content collapsed" id="govahi-print-settings-content">
-                <!-- بالا -->
+                <!-- ردیف بالا -->
                 <div class="row-control">
                     <span class="label">بالا</span>
-                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-up5">−۵</button>
-                    <button class="ctrl-btn" id="govahi-offsetY-up">−</button>
-                    <span class="value-display" id="govahi-offsetY-val">0</span>
-                    <button class="ctrl-btn" id="govahi-offsetY-down">+</button>
-                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-down5">+۵</button>
+                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-up-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetY-up-dec">−</button>
+                    <span class="value-display" id="govahi-offsetY-val-top">0</span>
+                    <button class="ctrl-btn" id="govahi-offsetY-up-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-up-inc5">+۵</button>
                 </div>
-                <!-- پایین -->
+                <!-- ردیف پایین -->
                 <div class="row-control">
                     <span class="label">پایین</span>
-                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-down5">−۵</button>
-                    <button class="ctrl-btn" id="govahi-offsetY-down">−</button>
-                    <span class="value-display">-</span>
-                    <button class="ctrl-btn" id="govahi-offsetY-up">+</button>
-                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-up5">+۵</button>
+                    <button class="ctrl-btn coarse-dec" id="govahi-offsetY-down-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetY-down-dec">−</button>
+                    <span class="value-display" id="govahi-offsetY-val-down">0</span>
+                    <button class="ctrl-btn" id="govahi-offsetY-down-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-offsetY-down-inc5">+۵</button>
                 </div>
-                <!-- راست (صحافی) -->
+                <!-- ردیف راست (صحافی) -->
                 <div class="row-control">
                     <span class="label">راست</span>
-                    <button class="ctrl-btn coarse-dec" id="govahi-offsetX-right5">−۵</button>
-                    <button class="ctrl-btn" id="govahi-offsetX-right">−</button>
+                    <button class="ctrl-btn coarse-dec" id="govahi-offsetX-right-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetX-right-dec">−</button>
                     <span class="value-display" id="govahi-offsetX-val">0</span>
-                    <button class="ctrl-btn" id="govahi-offsetX-left">+</button>
-                    <button class="ctrl-btn coarse-inc" id="govahi-offsetX-left5">+۵</button>
+                    <button class="ctrl-btn" id="govahi-offsetX-right-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-offsetX-right-inc5">+۵</button>
                 </div>
-                <!-- پهنا -->
+                <!-- ردیف پهنا -->
                 <div class="row-control">
                     <span class="label">پهنا</span>
                     <button class="ctrl-btn coarse-dec" id="govahi-width-dec5">−۵</button>
@@ -188,7 +188,7 @@
                     <button class="ctrl-btn" id="govahi-width-inc">+</button>
                     <button class="ctrl-btn coarse-inc" id="govahi-width-inc5">+۵</button>
                 </div>
-                <!-- Zoom -->
+                <!-- ردیف بزرگنمایی -->
                 <div class="row-control">
                     <span class="label">Zoom</span>
                     <button class="ctrl-btn coarse-dec" id="govahi-scale-out5">−۵</button>
@@ -337,5 +337,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (old-style buttons, width control restored)');
+    console.log('Govahi UI Panel ready. (clean +/- style, width row)');
 })();
