@@ -10,7 +10,7 @@
         scale: 1,          // بزرگنمایی (۱ = ۱۰۰٪)
         widthOffset: 0,    // افزایش/کاهش عرض بر حسب پیکسل
         cardGap: 0,        // فاصلهٔ عمودی بین کارت‌ها (پیکسل)
-        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل) -- جدید
+        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل)
     };
 
     var baseWidth = null;
@@ -31,7 +31,7 @@
         target.style.setProperty('margin', '0', 'important');
         target.style.setProperty('padding', '0', 'important');
 
-        // ۳. عرض
+        // ۳. عرض کلی
         var newWidth = baseWidth + settings.widthOffset;
         target.style.setProperty('width', newWidth + 'px', 'important');
 
@@ -40,16 +40,37 @@
         target.style.setProperty('transform', transformValue, 'important');
         target.style.setProperty('transform-origin', 'top right', 'important');
 
-        // ۵. فاصلهٔ عمودی بین کارت‌ها (margin-bottom)
+        // ۵. فاصلهٔ عمودی (margin-bottom) روی هر کارت
         var cards = target.querySelectorAll('.col-md-6');
         cards.forEach(function(card) {
             card.style.marginBottom = settings.cardGap + 'px';
         });
 
-        // ۶. فاصلهٔ افقی بین کارت‌ها (gap روی ردیف)
+        // ۶. فاصلهٔ افقی با flexbox
         var row = target.querySelector('.row.printt');
         if (row) {
-            row.style.gap = settings.cardGapH + 'px';
+            if (settings.cardGapH > 0) {
+                row.style.display = 'flex';
+                row.style.flexWrap = 'wrap';
+                row.style.justifyContent = 'flex-end';  // RTL
+                row.style.gap = settings.cardGapH + 'px';
+                // پهنای هر کارت به‌صورت ۵۰٪ منهای نصف گپ
+                var cardWidth = 'calc(50% - ' + (settings.cardGapH / 2) + 'px)';
+                cards.forEach(function(card) {
+                    card.style.width = cardWidth;
+                    card.style.flex = 'none';
+                });
+            } else {
+                // بازگشت به حالت پیش‌فرض (float)
+                row.style.display = '';
+                row.style.flexWrap = '';
+                row.style.justifyContent = '';
+                row.style.gap = '';
+                cards.forEach(function(card) {
+                    card.style.width = '';  // 50% پیش‌فرض بوت‌استرپ
+                    card.style.flex = '';
+                });
+            }
         }
 
         // ۷. دکمهٔ چاپ (فوتر)
@@ -150,5 +171,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (card gap horizontal added)');
+    console.log('✅ print-settings module loaded. (flex-based horizontal gap)');
 })();
