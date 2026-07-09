@@ -9,7 +9,7 @@
         #govahi-panel {
             position: fixed; top: 100px; left: 20px; width: 300px;
             background: #fff; border: 1px solid #ddd; border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 1060;  /* افزایش یافت */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 1060;
             font-family: Tahoma, sans-serif; font-size: 13px;
             display: none; user-select: none;
         }
@@ -145,7 +145,7 @@
 
         #govahi-floating-toggle {
             position: fixed; bottom: 20px; left: 20px;
-            z-index: 1055;  /* افزایش یافت */
+            z-index: 1055;
             width: 48px; height: 48px;
             background: linear-gradient(135deg, #007bff, #0056b3);
             border-radius: 50%; display: flex;
@@ -207,6 +207,15 @@
                     <span class="value-display" id="govahi-width-val">0</span>
                     <button class="ctrl-btn" id="govahi-width-inc">+</button>
                     <button class="ctrl-btn coarse-inc" id="govahi-width-inc5">+۵</button>
+                </div>
+                <!-- ردیف فاصله کارت‌ها (جدید) -->
+                <div class="row-control">
+                    <span class="label">فاصله</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-cardGap-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-cardGap-dec">−</button>
+                    <span class="value-display" id="govahi-cardGap-val">0</span>
+                    <button class="ctrl-btn" id="govahi-cardGap-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-cardGap-inc5">+۵</button>
                 </div>
                 <!-- ردیف بزرگنمایی -->
                 <div class="row-control">
@@ -360,5 +369,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (z-index restored for modal overlay)');
+    console.log('Govahi UI Panel ready. (card gap row added)');
 })();
