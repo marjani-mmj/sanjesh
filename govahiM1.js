@@ -14,11 +14,13 @@
 
     window.GovahiApp = window.GovahiApp || {};
 
+    // ترتیب بارگذاری: local-assigner قبل از certificate-filler
     var modules = [
         '/modules/config.js',
         '/modules/extractor.js',
         '/modules/ui-panel.js',
         '/modules/api-handler.js',
+        '/modules/local-assigner.js',   // جدید
         '/modules/certificate-filler.js'
     ];
 
@@ -34,9 +36,11 @@
 
     function loadModulesSequentially(index) {
         if (index >= modules.length) {
+            // همه ماژول‌ها بارگذاری شدند
             if (typeof GovahiApp.extractor === 'undefined' ||
                 typeof GovahiApp.ui === 'undefined' ||
-                typeof GovahiApp.apiHandler === 'undefined') {
+                typeof GovahiApp.apiHandler === 'undefined' ||
+                typeof GovahiApp.localAssigner === 'undefined') {
                 console.error('برخی ماژول‌ها بارگذاری نشدند.');
                 return;
             }
@@ -49,11 +53,13 @@
                 return GovahiApp.config.apiUrl;
             };
 
+            // مخفی کردن فیلد آدرس (در صورت وجود)
             var apiInput = document.getElementById('api-url-input');
             if (apiInput) {
                 apiInput.style.display = 'none';
             }
 
+            // ---------- تنظیم ارسال به API (همانند قبل) ----------
             GovahiApp.apiHandler.send = function(data) {
                 var url = GovahiApp.ui.getApiUrl();
                 if (!url) {
@@ -111,16 +117,51 @@
                 });
             };
 
+            // ---------- رویداد استخراج (با بررسی منطقه) ----------
             GovahiApp.ui.onExtract(function() {
                 var header = GovahiApp.extractor.extractHeader();
                 var students = GovahiApp.extractor.extractStudents();
                 window.extractedData = { header: header, students: students };
                 GovahiApp.extractor.highlightRows();
-                GovahiApp.ui.setStatus('✅ اطلاعات استخراج و ذخیره شد.');
-                GovahiApp.ui.enableSendButton();
+
+                var regionCode = header['کد_منطقه'] || header['region_code'] || '';
+                var authorized = GovahiApp.config.authorizedRegions;
+
+                if (authorized.indexOf(regionCode) !== -1) {
+                    GovahiApp.isRegionAuthorized = true;
+                    GovahiApp.ui.enableSendButton();
+                    GovahiApp.ui.hideManualInput();
+                    GovahiApp.ui.setStatus('✅ اطلاعات استخراج و ذخیره شد. منطقه مجاز می‌باشد.');
+                } else {
+                    GovahiApp.isRegionAuthorized = false;
+                    GovahiApp.ui.disableSendButton();
+                    GovahiApp.ui.showManualInput();
+                    GovahiApp.ui.setStatus('⚠️ کد منطقه غیرمجاز. لطفاً شماره شروع و تاریخ را وارد کرده و سپس اختصاص دهید.');
+                }
+
                 console.log('Extracted Data:', window.extractedData);
             });
 
+            // ---------- دکمهٔ اختصاص محلی ----------
+            document.getElementById('govahi-assign-local-btn').addEventListener('click', function() {
+                var startNumber = parseInt(document.getElementById('govahi-start-number').value, 10);
+                var issueDate = document.getElementById('govahi-issue-date').value.trim();
+
+                if (!startNumber || !issueDate) {
+                    alert('لطفاً شماره شروع و تاریخ را وارد کنید.');
+                    return;
+                }
+
+                if (!window.extractedData || !window.extractedData.students) {
+                    alert('ابتدا اطلاعات را استخراج کنید.');
+                    return;
+                }
+
+                GovahiApp.localAssigner.assign(startNumber, issueDate);
+                GovahiApp.ui.setStatus('✅ شماره گواهینامه‌ها با موفقیت اختصاص یافت.');
+            });
+
+            // ---------- رویداد ارسال (همانند قبل) ----------
             GovahiApp.ui.onSend(function() {
                 if (!window.extractedData) {
                     alert('ابتدا اطلاعات را استخراج کنید.');
