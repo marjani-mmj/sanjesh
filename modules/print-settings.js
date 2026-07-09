@@ -10,7 +10,7 @@
         scale: 1,          // بزرگنمایی (۱ = ۱۰۰٪)
         widthOffset: 0,    // افزایش/کاهش عرض بر حسب پیکسل
         cardGap: 0,        // فاصلهٔ عمودی بین کارت‌ها (پیکسل)
-        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل) – از طریق column-gap
+        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل) - margin-left روی کارت‌های سمت چپ
     };
 
     var baseWidth = null;
@@ -25,9 +25,8 @@
             baseWidth = target.getBoundingClientRect().width;
         }
 
-        // ۲. رفع محدودیت‌های ارتفاع، overflow و max-width
+        // ۲. رفع محدودیت‌های ارتفاع و overflow
         target.style.setProperty('max-height', 'none', 'important');
-        target.style.setProperty('max-width', 'none', 'important');
         target.style.setProperty('overflow', 'visible', 'important');
         target.style.setProperty('margin', '0', 'important');
         target.style.setProperty('padding', '0', 'important');
@@ -41,39 +40,24 @@
         target.style.setProperty('transform', transformValue, 'important');
         target.style.setProperty('transform-origin', 'top right', 'important');
 
-        // ۵. فاصلهٔ عمودی (margin-bottom) روی هر کارت
+        // ۵. فاصلهٔ عمودی (همهٔ کارت‌ها)
         var allCards = target.querySelectorAll('.col-md-6');
         allCards.forEach(function(card) {
             card.style.marginBottom = settings.cardGap + 'px';
         });
 
-        // ۶. فاصلهٔ افقی با Flexbox و column-gap
-        var row = target.querySelector('.row.printt');
-        if (row) {
-            // فعال‌سازی مجدد Flex (پیش‌فرض Bootstrap)
-            row.style.display = 'flex';
-            row.style.flexWrap = 'wrap';
-            row.style.columnGap = settings.cardGapH + 'px';   // فاصلهٔ افقی
-            row.style.rowGap = '0';                           // فاصلهٔ عمودی توسط margin کنترل می‌شود
-
-            // محاسبه عرض جدید برای هر کارت
-            var newCardWidth = 'calc((100% - ' + settings.cardGapH + 'px) / 2)';
-
-            allCards.forEach(function(card) {
-                if (settings.cardGapH > 0) {
-                    card.style.width = newCardWidth;
-                    card.style.maxWidth = newCardWidth;
-                    card.style.flex = '0 0 ' + newCardWidth;
-                    card.style.marginLeft = '';   // حذف margin-left قبلی
-                } else {
-                    // بازگشت به پیش‌فرض Bootstrap
-                    card.style.width = '';
-                    card.style.maxWidth = '';
-                    card.style.flex = '';
-                    card.style.marginLeft = '';
-                }
-            });
-        }
+        // ۶. فاصلهٔ افقی: فقط کارت‌های سمت چپ (ایندکس فرد: ۱,۳,۵...)
+        allCards.forEach(function(card, index) {
+            if (index % 2 === 1) { // کارت سمت چپ (در RTL ایندکس ۱,۳,۵...)
+                card.style.marginLeft = settings.cardGapH + 'px';
+                card.style.width = 'calc(50% - ' + settings.cardGapH + 'px)';
+                card.style.flex = 'none';
+            } else {
+                card.style.marginLeft = '';
+                card.style.width = '';  // بازگشت به پیش‌فرض ۵۰٪ بوت‌استرپ
+                card.style.flex = '';
+            }
+        });
 
         // ۷. دکمهٔ چاپ (فوتر)
         var modalContent = target.closest('.modal-content');
@@ -147,9 +131,9 @@
         document.getElementById('govahi-cardGap-inc')?.addEventListener('click', function() { settings.cardGap += 1; refresh(); });
         document.getElementById('govahi-cardGap-inc5')?.addEventListener('click', function() { settings.cardGap += 5; refresh(); });
 
-        // ---- فاصلهٔ افقی (column-gap) ----
-        document.getElementById('govahi-cardGapH-dec5')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 5); refresh(); });
-        document.getElementById('govahi-cardGapH-dec')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 1); refresh(); });
+        // ---- فاصلهٔ افقی ----
+        document.getElementById('govahi-cardGapH-dec5')?.addEventListener('click', function() { settings.cardGapH -= 5; refresh(); });
+        document.getElementById('govahi-cardGapH-dec')?.addEventListener('click', function() { settings.cardGapH -= 1; refresh(); });
         document.getElementById('govahi-cardGapH-inc')?.addEventListener('click', function() { settings.cardGapH += 1; refresh(); });
         document.getElementById('govahi-cardGapH-inc5')?.addEventListener('click', function() { settings.cardGapH += 5; refresh(); });
 
@@ -173,5 +157,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (column-gap, both cards shrink)');
+    console.log('✅ print-settings module loaded. (horizontal gap via margin-left)');
 })();
