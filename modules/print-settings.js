@@ -37,6 +37,7 @@
     }
 
     function updateDisplay() {
+        // به‌روزرسانی نمایشگرها با مقادیر واقعی settings
         var ox = document.getElementById('govahi-offsetX-val');
         var oy = document.getElementById('govahi-offsetY-val-top');
         var sc = document.getElementById('govahi-scale-val');
@@ -46,6 +47,8 @@
         if (oy) oy.textContent = settings.offsetY;
         if (sc) sc.textContent = Math.round(settings.scale * 100) + '%';
         if (wd) wd.textContent = settings.widthOffset;
+
+        console.log('📏 تنظیمات چاپ:', JSON.parse(JSON.stringify(settings)));
     }
 
     function refresh() {
@@ -89,6 +92,7 @@
         // ---- تنظیم مجدد ----
         document.getElementById('govahi-reset-settings-btn')?.addEventListener('click', reset);
 
+        // مقداردهی اولیه نمایشگرها
         updateDisplay();
     }
 
@@ -100,5 +104,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (Observer removed)');
+    console.log('✅ print-settings module loaded. (display fix)');
 })();
