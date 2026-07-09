@@ -86,7 +86,7 @@
         }
         #govahi-panel .action-row .action-btn {
             flex: 1;
-            margin-bottom: 0;  /* حذف margin-bottom پیش‌فرض */
+            margin-bottom: 0;
         }
         #govahi-panel button.action-btn {
             width: 100%; padding: 6px; margin-bottom: 6px;
@@ -94,6 +94,27 @@
             border-radius: 4px; cursor: pointer; font-weight: bold;
         }
         #govahi-panel button.action-btn:disabled { background: #6c757d; cursor: not-allowed; }
+
+        /* بخش ورودی دستی */
+        #govahi-panel .manual-section {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ccc;
+        }
+        #govahi-panel .manual-section input {
+            width: 80px;
+            padding: 2px 4px;
+            margin: 0 4px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        #govahi-panel .manual-section .row-control .label {
+            width: auto;
+            margin-left: 0;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
 
         #govahi-floating-toggle {
             position: fixed; bottom: 20px; left: 20px;
@@ -175,11 +196,24 @@
 
             <!-- بخش عملیات گواهینامه -->
             <div class="section-title">📋 عملیات گواهینامه</div>
-            <!-- دکمه‌ها در یک ردیف با اندازهٔ مساوی -->
             <div class="action-row" id="govahi-action-row">
                 <button class="action-btn" id="govahi-extract-btn">📋 شناسایی</button>
                 <button class="action-btn" id="govahi-send-to-api-btn" disabled>📤 ارسال به سنجش</button>
             </div>
+
+            <!-- بخش ورودی دستی (ابتدا مخفی) -->
+            <div id="govahi-manual-section" class="manual-section" style="display:none;">
+                <div class="row-control">
+                    <span class="label">شماره شروع:</span>
+                    <input type="number" id="govahi-start-number" min="1" value="1" />
+                </div>
+                <div class="row-control">
+                    <span class="label">تاریخ صدور:</span>
+                    <input type="text" id="govahi-issue-date" placeholder="1402/01/01" />
+                </div>
+                <button class="action-btn" id="govahi-assign-local-btn" style="background:#e67e22;">📝 اختصاص شماره</button>
+            </div>
+
             <div class="status" id="govahi-status-msg"></div>
 
             <div style="margin-top:10px; text-align:center; font-size:11px; color:#adb5bd;">
@@ -301,6 +335,12 @@
         },
         disableSendButton: function() {
             document.getElementById('govahi-send-to-api-btn').disabled = true;
+        },
+        showManualInput: function() {
+            document.getElementById('govahi-manual-section').style.display = 'block';
+        },
+        hideManualInput: function() {
+            document.getElementById('govahi-manual-section').style.display = 'none';
         },
         onExtract: function(cb) {
             document.getElementById('govahi-extract-btn').onclick = cb;
