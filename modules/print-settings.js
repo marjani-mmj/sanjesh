@@ -64,7 +64,6 @@
                     card.style.flex = '0 0 ' + newCardWidth;
                     card.style.marginLeft = '';
                 } else {
-                    // بازگشت به پیش‌فرض Bootstrap
                     card.style.width = '';
                     card.style.maxWidth = '';
                     card.style.flex = '';
@@ -73,16 +72,26 @@
             });
         }
 
-        // ۷. اطمینان از عرض ۱۰۰٪ المان‌های فوتر درون هر کارت
+        // ۷. عرض ۱۰۰٪ برای ردیف‌های فوتر داخل کارت‌ها
         var footerRows = target.querySelectorAll('.row.panel-footer-report');
         footerRows.forEach(function(ft) {
             ft.style.setProperty('width', '100%', 'important');
             ft.style.setProperty('box-sizing', 'border-box', 'important');
-            // رفع float در صورت لزوم (اختیاری)
             ft.style.float = 'none';
         });
 
-        // ۸. دکمهٔ چاپ (فوتر مودال)
+        // ۸. اصلاح عناصر absolute با top درصدی (مانند متن «این گواهینامه فقط یک بار صادر می‌شود»)
+        var absoluteDivs = target.querySelectorAll('.textt > div[style*="position: absolute"]');
+        absoluteDivs.forEach(function(div) {
+            if (div.style.top && div.style.top.includes('%')) {
+                div.style.position = 'relative';
+                div.style.top = 'auto';
+                div.style.marginTop = '20px';
+                div.style.clear = 'both';
+            }
+        });
+
+        // ۹. دکمهٔ چاپ (فوتر مودال)
         var modalContent = target.closest('.modal-content');
         if (modalContent) {
             var footer = modalContent.querySelector('.modal-footer');
@@ -180,5 +189,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (footer width 100%, both cards shrink)');
+    console.log('✅ print-settings module loaded. (absolute fix for footnotes)');
 })();
