@@ -39,7 +39,8 @@
             if (typeof GovahiApp.extractor === 'undefined' ||
                 typeof GovahiApp.ui === 'undefined' ||
                 typeof GovahiApp.apiHandler === 'undefined' ||
-                typeof GovahiApp.localAssigner === 'undefined') {
+                typeof GovahiApp.localAssigner === 'undefined' ||
+                typeof GovahiApp.printSettings === 'undefined') {
                 console.error('برخی ماژول‌ها بارگذاری نشدند.');
                 return;
             }
@@ -57,6 +58,26 @@
                 apiInput.style.display = 'none';
             }
 
+            // ---------- تابع پاک‌سازی کامل حافظه و کش ----------
+            function clearAllPreviousData() {
+                // 1. پاک کردن شیء استخراج‌شده
+                window.extractedData = null;
+                GovahiApp.isRegionAuthorized = undefined;
+
+                // 2. پاک کردن تمام کش localStorage مربوط به گواهینامه‌ها
+                var keysToRemove = [];
+                for (var i = 0; i < localStorage.length; i++) {
+                    var key = localStorage.key(i);
+                    if (key && key.startsWith('gavahiname_')) {
+                        keysToRemove.push(key);
+                    }
+                }
+                keysToRemove.forEach(function(key) {
+                    localStorage.removeItem(key);
+                });
+                console.log('🧹 حافظه و کش قبلی پاک شدند.');
+            }
+
             // ---------- ابزار تشخیص صفحه ----------
             function isOnListPage() {
                 return document.querySelectorAll('.modal-body tbody tr').length > 0;
@@ -66,7 +87,6 @@
                 return document.querySelectorAll('#print-content .col-md-6').length > 0;
             }
 
-            // ---------- بروزرسانی وضعیت دکمه‌ها ----------
             function updateButtonStates() {
                 if (isOnCertificatePage()) {
                     GovahiApp.ui.setExtractEnabled(false);
@@ -91,20 +111,22 @@
                 }
             }
 
-            // ---------- پایش تغییرات صفحه با MutationObserver ----------
             var observer = new MutationObserver(function() {
                 updateButtonStates();
             });
             observer.observe(document.body, { childList: true, subtree: true });
 
-            // ---------- رویداد استخراج ----------
+            // ---------- رویداد استخراج (شناسایی) ----------
             GovahiApp.ui.onExtract(function() {
                 if (!isOnListPage()) {
                     GovahiApp.ui.setStatus('⚠️ این عملیات فقط در صفحهٔ لیست فارغ‌التحصیلان قابل انجام است.');
                     return;
                 }
 
-                // ---------- تزریق استایل چاپ (حذف حاشیه‌ها) ----------
+                // پاک‌سازی کامل قبل از استخراج جدید
+                clearAllPreviousData();
+
+                // تزریق استایل چاپ
                 if (!document.getElementById('govahi-print-style')) {
                     var printStyle = document.createElement('style');
                     printStyle.id = 'govahi-print-style';
@@ -115,7 +137,6 @@
                                 margin: 0 !important;
                             }
                         }
-                        /* تلاش برای باز کردن تنظیمات چاپ (Chrome) */
                         print-preview-layout-settings,
                         print-preview-more-settings {
                             display: block !important;
@@ -126,7 +147,6 @@
                     console.log('✅ تنظیمات چاپ برای حذف حاشیه‌ها اعمال شد.');
                 }
 
-                // استخراج اطلاعات
                 var header = GovahiApp.extractor.extractHeader();
                 var students = GovahiApp.extractor.extractStudents();
                 window.extractedData = { header: header, students: students };
@@ -157,6 +177,14 @@
                     GovahiApp.ui.setStatus('⚠️ این عملیات فقط در صفحهٔ لیست فارغ‌التحصیلان قابل انجام است.');
                     return;
                 }
+
+                // قبل از اختصاص محلی، داده‌های قبلی را پاک می‌کنیم
+                clearAllPreviousData();
+
+                // دوباره استخراج می‌کنیم (تا داده‌های خام اولیه را داشته باشیم)
+                var header = GovahiApp.extractor.extractHeader();
+                var students = GovahiApp.extractor.extractStudents();
+                window.extractedData = { header: header, students: students };
 
                 var startNumber = parseInt(document.getElementById('govahi-start-number').value, 10);
                 var issueDate = document.getElementById('govahi-issue-date').value.trim();
@@ -238,13 +266,21 @@
                     alert('ابتدا اطلاعات را استخراج کنید.');
                     return;
                 }
+
+                // پاک‌سازی کامل قبل از ارسال (تا داده‌های قدیمی تداخل نکنند)
+                clearAllPreviousData();
+
+                // دوباره استخراج می‌کنیم (چون clear داده‌ها را null کرده بود)
+                var header = GovahiApp.extractor.extractHeader();
+                var students = GovahiApp.extractor.extractStudents();
+                window.extractedData = { header: header, students: students };
+
                 GovahiApp.apiHandler.send(window.extractedData);
             });
 
-            // تنظیم اولیه وضعیت دکمه‌ها
             updateButtonStates();
 
-            console.log('GovahiApp ready. استفاده از دکمه شناور برای شروع.');
+            console.log('GovahiApp ready. (با پاک‌سازی خودکار قبل از عملیات)');
             return;
         }
 
