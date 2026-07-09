@@ -3,36 +3,6 @@
     'use strict';
     window.GovahiApp = window.GovahiApp || {};
 
-    // ---------- state تنظیمات چاپ ----------
-    var spacing = {
-        top: 0,
-        bottom: 0,
-        right: 0,
-        width: 0,
-        scale: 100
-    };
-
-    function applySettings() {
-        var target = document.getElementById('print-content');
-        if (!target) return;
-
-        target.style.setProperty('max-height', 'none', 'important');
-        target.style.setProperty('overflow', 'visible', 'important');
-
-        target.style.setProperty('margin-top', spacing.top + 'px', 'important');
-        target.style.setProperty('margin-bottom', spacing.bottom + 'px', 'important');
-        target.style.setProperty('margin-right', spacing.right + 'px', 'important');
-
-        if (spacing.width !== 0) {
-            target.style.setProperty('width', (100 + spacing.width) + '%', 'important');
-        } else {
-            target.style.setProperty('width', '100%', 'important');
-        }
-
-        target.style.setProperty('transform', 'scale(' + (spacing.scale / 100) + ')', 'important');
-        target.style.setProperty('transform-origin', 'top center', 'important');
-    }
-
     // ========== استایل‌ها ==========
     var style = document.createElement('style');
     style.textContent = `
@@ -106,7 +76,7 @@
             display: none;
         }
 
-        /* ورودی‌های همیشگی (در یک ردیف) */
+        /* ورودی‌های همیشگی */
         #govahi-panel .manual-fields {
             margin-top: 8px;
             padding-top: 8px;
@@ -322,43 +292,14 @@
         printSettingsToggle.classList.toggle('collapsed', isCollapsed);
     });
 
-    // ========== اتصال کنترل‌های چاپ ==========
-    function updateDisplay() {
-        document.getElementById('govahi-marginTopVal').textContent = spacing.top;
-        document.getElementById('govahi-marginBottomVal').textContent = spacing.bottom;
-        document.getElementById('govahi-marginRightVal').textContent = spacing.right;
-        document.getElementById('govahi-widthVal').textContent = spacing.width;
-        document.getElementById('govahi-zoomVal').textContent = spacing.scale + '%';
+    // ========== اتصال کنترل‌های چاپ از ماژول print-settings ==========
+    if (GovahiApp.printSettings && typeof GovahiApp.printSettings.bindControls === 'function') {
+        GovahiApp.printSettings.bindControls();
+    } else {
+        console.warn('ui-panel: printSettings ماژول بارگذاری نشده است. کنترل‌های چاپ غیرفعال می‌مانند.');
     }
 
-    document.getElementById('govahi-marginTopInc').addEventListener('click', function() { spacing.top++; updateDisplay(); });
-    document.getElementById('govahi-marginTopDec').addEventListener('click', function() { spacing.top--; updateDisplay(); });
-    document.getElementById('govahi-marginTopInc5').addEventListener('click', function() { spacing.top += 5; updateDisplay(); });
-    document.getElementById('govahi-marginTopDec5').addEventListener('click', function() { spacing.top -= 5; updateDisplay(); });
-
-    document.getElementById('govahi-marginBottomInc').addEventListener('click', function() { spacing.bottom++; updateDisplay(); });
-    document.getElementById('govahi-marginBottomDec').addEventListener('click', function() { spacing.bottom--; updateDisplay(); });
-    document.getElementById('govahi-marginBottomInc5').addEventListener('click', function() { spacing.bottom += 5; updateDisplay(); });
-    document.getElementById('govahi-marginBottomDec5').addEventListener('click', function() { spacing.bottom -= 5; updateDisplay(); });
-
-    document.getElementById('govahi-marginRightInc').addEventListener('click', function() { spacing.right++; updateDisplay(); });
-    document.getElementById('govahi-marginRightDec').addEventListener('click', function() { spacing.right--; updateDisplay(); });
-    document.getElementById('govahi-marginRightInc5').addEventListener('click', function() { spacing.right += 5; updateDisplay(); });
-    document.getElementById('govahi-marginRightDec5').addEventListener('click', function() { spacing.right -= 5; updateDisplay(); });
-
-    document.getElementById('govahi-widthInc').addEventListener('click', function() { spacing.width++; updateDisplay(); });
-    document.getElementById('govahi-widthDec').addEventListener('click', function() { spacing.width--; updateDisplay(); });
-    document.getElementById('govahi-widthInc5').addEventListener('click', function() { spacing.width += 5; updateDisplay(); });
-    document.getElementById('govahi-widthDec5').addEventListener('click', function() { spacing.width -= 5; updateDisplay(); });
-
-    document.getElementById('govahi-zoomInc').addEventListener('click', function() { spacing.scale = Math.min(200, spacing.scale + 1); updateDisplay(); });
-    document.getElementById('govahi-zoomDec').addEventListener('click', function() { spacing.scale = Math.max(10, spacing.scale - 1); updateDisplay(); });
-    document.getElementById('govahi-zoomInc5').addEventListener('click', function() { spacing.scale = Math.min(200, spacing.scale + 5); updateDisplay(); });
-    document.getElementById('govahi-zoomDec5').addEventListener('click', function() { spacing.scale = Math.max(10, spacing.scale - 5); updateDisplay(); });
-
-    document.getElementById('govahi-applySettingsBtn').addEventListener('click', applySettings);
-
-    // ========== API عمومی ==========
+    // ========== API عمومی برای سایر ماژول‌ها ==========
     GovahiApp.ui = {
         togglePanel: function() {
             if (panel.style.display === 'none') {
@@ -395,7 +336,6 @@
         onSend: function(cb) {
             document.getElementById('govahi-send-to-api-btn').onclick = cb;
         },
-        // متدهای جدید برای فعال/غیرفعال‌سازی دکمه‌ها
         setExtractEnabled: function(enabled) {
             document.getElementById('govahi-extract-btn').disabled = !enabled;
         },
@@ -405,6 +345,5 @@
         }
     };
 
-    // مقداردهی اولیه نمایشگرها
-    updateDisplay();
+    console.log('Govahi UI Panel ready.');
 })();
