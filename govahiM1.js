@@ -68,17 +68,12 @@
             // ---------- بروزرسانی وضعیت دکمه‌ها ----------
             function updateButtonStates() {
                 if (isOnCertificatePage()) {
-                    // صفحهٔ گواهینامه: دکمه‌های شناسایی و اختصاص غیرفعال + مخفی کردن بخش دستی
                     GovahiApp.ui.setExtractEnabled(false);
                     GovahiApp.ui.setAssignEnabled(false);
-                    GovahiApp.ui.hideManualInput();        // مخفی کردن دکمه اختصاص
-                    GovahiApp.ui.disableSendButton();      // ارسال به سنجش هم غیرفعال (منطقی)
+                    GovahiApp.ui.hideManualInput();
+                    GovahiApp.ui.disableSendButton();
                 } else {
-                    // صفحهٔ لیست: فعال‌سازی اولیه
                     GovahiApp.ui.setExtractEnabled(true);
-                    // وضعیت اختصاص/ارسال بستگی به مجوز منطقه دارد؛ با کلیک روی شناسایی مشخص می‌شود
-                    // اما اگر قبلاً استخراج انجام شده، می‌تواند وضعیت دکمه‌ها را نگه دارد.
-                    // اینجا دکمهٔ اختصاص را فعلاً فعال می‌گذاریم (در صورتی که بخش دستی نمایش داده شده باشد فعال است)
                     if (GovahiApp.isRegionAuthorized !== undefined) {
                         if (GovahiApp.isRegionAuthorized) {
                             GovahiApp.ui.enableSendButton();
@@ -89,7 +84,6 @@
                             GovahiApp.ui.setAssignEnabled(true);
                         }
                     } else {
-                        // هنوز استخراج نشده: دکمه ارسال غیرفعال، بخش دستی مخفی
                         GovahiApp.ui.disableSendButton();
                         GovahiApp.ui.hideManualInput();
                     }
@@ -109,6 +103,29 @@
                     return;
                 }
 
+                // ---------- تزریق استایل چاپ (حذف حاشیه‌ها) ----------
+                if (!document.getElementById('govahi-print-style')) {
+                    var printStyle = document.createElement('style');
+                    printStyle.id = 'govahi-print-style';
+                    printStyle.innerHTML = `
+                        @media print {
+                            @page {
+                                size: auto !important;
+                                margin: 0 !important;
+                            }
+                        }
+                        /* تلاش برای باز کردن تنظیمات چاپ (Chrome) */
+                        print-preview-layout-settings,
+                        print-preview-more-settings {
+                            display: block !important;
+                            visibility: visible !important;
+                        }
+                    `;
+                    document.head.appendChild(printStyle);
+                    console.log('✅ تنظیمات چاپ برای حذف حاشیه‌ها اعمال شد.');
+                }
+
+                // استخراج اطلاعات
                 var header = GovahiApp.extractor.extractHeader();
                 var students = GovahiApp.extractor.extractStudents();
                 window.extractedData = { header: header, students: students };
