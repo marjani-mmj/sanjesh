@@ -9,7 +9,7 @@
         #govahi-panel {
             position: fixed; top: 100px; left: 20px; width: 300px;
             background: #fff; border: 1px solid #ddd; border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 100000;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 1000;  /* کاهش یافت */
             font-family: Tahoma, sans-serif; font-size: 13px;
             display: none; user-select: none;
         }
@@ -145,7 +145,8 @@
 
         #govahi-floating-toggle {
             position: fixed; bottom: 20px; left: 20px;
-            z-index: 999999; width: 48px; height: 48px;
+            z-index: 999;  /* کاهش یافت */
+            width: 48px; height: 48px;
             background: linear-gradient(135deg, #007bff, #0056b3);
             border-radius: 50%; display: flex;
             align-items: center; justify-content: center;
@@ -359,5 +360,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (modern reset button)');
+    console.log('Govahi UI Panel ready. (z-index reduced, observer removed)');
 })();
