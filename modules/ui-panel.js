@@ -76,6 +76,57 @@
             border-radius: 6px; font-weight: bold; cursor: pointer;
         }
         #govahi-panel .separator { border-top: 1px solid #dee2e6; margin: 10px 0; }
+
+        /* قاب جمع‌شو */
+        #govahi-panel .collapsible-header {
+            background: #f1f3f5;
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 6px;
+            user-select: none;
+        }
+        #govahi-panel .collapsible-header .toggle-icon {
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        #govahi-panel .collapsible-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        #govahi-panel .collapsible-content {
+            padding: 0 0 4px 0;
+        }
+        #govahi-panel .collapsible-content.collapsed {
+            display: none;
+        }
+
+        /* ورودی‌های دستی همیشگی */
+        #govahi-panel .manual-fields {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ccc;
+        }
+        #govahi-panel .manual-fields .row-control .label {
+            width: auto;
+            margin-left: 0;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+        #govahi-panel .manual-fields input {
+            width: 80px;
+            padding: 2px 4px;
+            margin: 0 4px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
         #govahi-panel .status { font-size: 12px; color: #28a745; margin-top: 5px; text-align: center; }
 
         /* دکمه‌های عملیات */
@@ -94,27 +145,6 @@
             border-radius: 4px; cursor: pointer; font-weight: bold;
         }
         #govahi-panel button.action-btn:disabled { background: #6c757d; cursor: not-allowed; }
-
-        /* بخش ورودی دستی */
-        #govahi-panel .manual-section {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px dashed #ccc;
-        }
-        #govahi-panel .manual-section input {
-            width: 80px;
-            padding: 2px 4px;
-            margin: 0 4px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        #govahi-panel .manual-section .row-control .label {
-            width: auto;
-            margin-left: 0;
-            margin-right: 5px;
-            white-space: nowrap;
-        }
 
         #govahi-floating-toggle {
             position: fixed; bottom: 20px; left: 20px;
@@ -146,51 +176,66 @@
             <span class="close-btn" id="govahi-close-btn">&times;</span>
         </div>
         <div class="panel-body">
-            <!-- بخش تنظیمات چاپ -->
-            <div class="section-title">📏 حاشیه‌ها و بزرگنمایی</div>
+            <!-- بخش تنظیمات چاپ (جمع‌شو) -->
+            <div class="collapsible-header collapsed" id="govahi-print-settings-toggle">
+                <span>📏 حاشیه‌ها و بزرگنمایی</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="collapsible-content collapsed" id="govahi-print-settings-content">
+                <div class="row-control">
+                    <span class="label">بالا</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-marginTopDec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-marginTopDec">−</button>
+                    <span class="value-display" id="govahi-marginTopVal">0</span>
+                    <button class="ctrl-btn" id="govahi-marginTopInc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-marginTopInc5">+۵</button>
+                </div>
+                <div class="row-control">
+                    <span class="label">پایین</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-marginBottomDec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-marginBottomDec">−</button>
+                    <span class="value-display" id="govahi-marginBottomVal">0</span>
+                    <button class="ctrl-btn" id="govahi-marginBottomInc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-marginBottomInc5">+۵</button>
+                </div>
+                <div class="row-control">
+                    <span class="label">راست</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-marginRightDec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-marginRightDec">−</button>
+                    <span class="value-display" id="govahi-marginRightVal">0</span>
+                    <button class="ctrl-btn" id="govahi-marginRightInc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-marginRightInc5">+۵</button>
+                </div>
+                <div class="row-control">
+                    <span class="label">پهنا</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-widthDec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-widthDec">−</button>
+                    <span class="value-display" id="govahi-widthVal">0</span>
+                    <button class="ctrl-btn" id="govahi-widthInc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-widthInc5">+۵</button>
+                </div>
+                <div class="row-control">
+                    <span class="label">Zoom</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-zoomDec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-zoomDec">−</button>
+                    <span class="value-display zoom-display" id="govahi-zoomVal">100%</span>
+                    <button class="ctrl-btn" id="govahi-zoomInc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-zoomInc5">+۵</button>
+                </div>
+                <button class="apply-btn" id="govahi-applySettingsBtn">اعمال تنظیمات</button>
+            </div>
 
-            <div class="row-control">
-                <span class="label">بالا</span>
-                <button class="ctrl-btn coarse-dec" id="govahi-marginTopDec5">−۵</button>
-                <button class="ctrl-btn" id="govahi-marginTopDec">−</button>
-                <span class="value-display" id="govahi-marginTopVal">0</span>
-                <button class="ctrl-btn" id="govahi-marginTopInc">+</button>
-                <button class="ctrl-btn coarse-inc" id="govahi-marginTopInc5">+۵</button>
+            <!-- ورودی‌های شماره شروع و تاریخ (همیشه نمایش) -->
+            <div class="manual-fields">
+                <div class="row-control">
+                    <span class="label">شماره شروع:</span>
+                    <input type="number" id="govahi-start-number" min="1" value="1" />
+                </div>
+                <div class="row-control">
+                    <span class="label">تاریخ صدور:</span>
+                    <input type="text" id="govahi-issue-date" placeholder="1402/01/01" />
+                </div>
             </div>
-            <div class="row-control">
-                <span class="label">پایین</span>
-                <button class="ctrl-btn coarse-dec" id="govahi-marginBottomDec5">−۵</button>
-                <button class="ctrl-btn" id="govahi-marginBottomDec">−</button>
-                <span class="value-display" id="govahi-marginBottomVal">0</span>
-                <button class="ctrl-btn" id="govahi-marginBottomInc">+</button>
-                <button class="ctrl-btn coarse-inc" id="govahi-marginBottomInc5">+۵</button>
-            </div>
-            <div class="row-control">
-                <span class="label">راست</span>
-                <button class="ctrl-btn coarse-dec" id="govahi-marginRightDec5">−۵</button>
-                <button class="ctrl-btn" id="govahi-marginRightDec">−</button>
-                <span class="value-display" id="govahi-marginRightVal">0</span>
-                <button class="ctrl-btn" id="govahi-marginRightInc">+</button>
-                <button class="ctrl-btn coarse-inc" id="govahi-marginRightInc5">+۵</button>
-            </div>
-            <div class="row-control">
-                <span class="label">پهنا</span>
-                <button class="ctrl-btn coarse-dec" id="govahi-widthDec5">−۵</button>
-                <button class="ctrl-btn" id="govahi-widthDec">−</button>
-                <span class="value-display" id="govahi-widthVal">0</span>
-                <button class="ctrl-btn" id="govahi-widthInc">+</button>
-                <button class="ctrl-btn coarse-inc" id="govahi-widthInc5">+۵</button>
-            </div>
-            <div class="row-control">
-                <span class="label">Zoom</span>
-                <button class="ctrl-btn coarse-dec" id="govahi-zoomDec5">−۵</button>
-                <button class="ctrl-btn" id="govahi-zoomDec">−</button>
-                <span class="value-display zoom-display" id="govahi-zoomVal">100%</span>
-                <button class="ctrl-btn" id="govahi-zoomInc">+</button>
-                <button class="ctrl-btn coarse-inc" id="govahi-zoomInc5">+۵</button>
-            </div>
-
-            <button class="apply-btn" id="govahi-applySettingsBtn">اعمال تنظیمات</button>
 
             <div class="separator"></div>
 
@@ -201,16 +246,8 @@
                 <button class="action-btn" id="govahi-send-to-api-btn" disabled>📤 ارسال به سنجش</button>
             </div>
 
-            <!-- بخش ورودی دستی (ابتدا مخفی) -->
-            <div id="govahi-manual-section" class="manual-section" style="display:none;">
-                <div class="row-control">
-                    <span class="label">شماره شروع:</span>
-                    <input type="number" id="govahi-start-number" min="1" value="1" />
-                </div>
-                <div class="row-control">
-                    <span class="label">تاریخ صدور:</span>
-                    <input type="text" id="govahi-issue-date" placeholder="1402/01/01" />
-                </div>
+            <!-- دکمه تخصیص محلی (نمایش بر اساس مجوز) -->
+            <div id="govahi-manual-section" style="display:none;">
                 <button class="action-btn" id="govahi-assign-local-btn" style="background:#e67e22;">📝 اختصاص شماره</button>
             </div>
 
@@ -275,6 +312,14 @@
         });
     })();
 
+    // ========== باز و بسته شدن تنظیمات چاپ ==========
+    var printSettingsToggle = document.getElementById('govahi-print-settings-toggle');
+    var printSettingsContent = document.getElementById('govahi-print-settings-content');
+    printSettingsToggle.addEventListener('click', function() {
+        var isCollapsed = printSettingsContent.classList.toggle('collapsed');
+        printSettingsToggle.classList.toggle('collapsed', isCollapsed);
+    });
+
     // ========== اتصال کنترل‌های چاپ ==========
     function updateDisplay() {
         document.getElementById('govahi-marginTopVal').textContent = spacing.top;
@@ -311,7 +356,7 @@
 
     document.getElementById('govahi-applySettingsBtn').addEventListener('click', applySettings);
 
-    // ========== API عمومی (برای govahiM1.js) ==========
+    // ========== API عمومی ==========
     GovahiApp.ui = {
         togglePanel: function() {
             if (panel.style.display === 'none') {
