@@ -10,7 +10,7 @@
         scale: 1,          // بزرگنمایی (۱ = ۱۰۰٪)
         widthOffset: 0,    // افزایش/کاهش عرض بر حسب پیکسل
         cardGap: 0,        // فاصلهٔ عمودی بین کارت‌ها (پیکسل)
-        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل) – margin-left روی کارت‌های سمت چپ
+        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل) – از طریق gap در grid
     };
 
     var baseWidth = null;
@@ -25,9 +25,9 @@
             baseWidth = target.getBoundingClientRect().width;
         }
 
-        // ۲. رفع محدودیت‌های ارتفاع، overflow و اکنون max-width
+        // ۲. رفع محدودیت‌ها
         target.style.setProperty('max-height', 'none', 'important');
-        target.style.setProperty('max-width', 'none', 'important');   // ← جدید: برای افزایش بدون محدودیت
+        target.style.setProperty('max-width', 'none', 'important');   // افزایش بدون محدودیت
         target.style.setProperty('overflow', 'visible', 'important');
         target.style.setProperty('margin', '0', 'important');
         target.style.setProperty('padding', '0', 'important');
@@ -41,26 +41,30 @@
         target.style.setProperty('transform', transformValue, 'important');
         target.style.setProperty('transform-origin', 'top right', 'important');
 
-        // ۵. فاصلهٔ عمودی (همهٔ کارت‌ها)
+        // ۵. فاصلهٔ عمودی (margin-bottom روی هر کارت)
         var allCards = target.querySelectorAll('.col-md-6');
         allCards.forEach(function(card) {
             card.style.marginBottom = settings.cardGap + 'px';
         });
 
-        // ۶. فاصلهٔ افقی: فقط کارت‌های سمت چپ (ایندکس‌های فرد در RTL)
-        allCards.forEach(function(card, index) {
-            if (index % 2 === 1) { // کارت سمت چپ
-                card.style.marginLeft = settings.cardGapH + 'px';
-                card.style.width = 'calc(50% - ' + settings.cardGapH + 'px)';
-                card.style.flex = 'none';
-            } else {
+        // ۶. فاصلهٔ افقی با استفاده از CSS Grid روی ردیف
+        var row = target.querySelector('.row.printt');
+        if (row) {
+            // اعمال grid برای کنترل بهتر فاصلهٔ افقی
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = '1fr 1fr';   // دو ستون مساوی
+            row.style.gap = settings.cardGapH + 'px';     // فاصلهٔ افقی (و عمودی در صورت نیاز)
+            row.style.flexWrap = '';                      // غیرفعال کردن flexwrap احتمالی
+            row.style.justifyContent = '';
+            // بازنشانی عرض‌های دستی کارت‌ها (grid مدیریت می‌کند)
+            allCards.forEach(function(card) {
+                card.style.width = '';
                 card.style.marginLeft = '';
-                card.style.width = '';  // بازگشت به ۵۰٪ پیش‌فرض
                 card.style.flex = '';
-            }
-        });
+            });
+        }
 
-        // ۷. دکمهٔ چاپ (فوتر) – بالای محتوای overflow شده
+        // ۷. دکمهٔ چاپ (فوتر)
         var modalContent = target.closest('.modal-content');
         if (modalContent) {
             var footer = modalContent.querySelector('.modal-footer');
@@ -158,5 +162,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (max-width fix + horizontal gap)');
+    console.log('✅ print-settings module loaded. (grid-based horizontal gap)');
 })();
