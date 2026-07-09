@@ -73,7 +73,7 @@
 
         /* کنترل‌های فاصله (فقط در صفحهٔ گواهینامه) */
         #govahi-gap-controls {
-            display: none;  /* پیش‌فرض مخفی */
+            display: none;
             margin-top: 8px;
             padding-top: 8px;
             border-top: 1px dashed #ccc;
@@ -346,7 +346,6 @@
         gapDiv.style.display = isCertPage ? 'block' : 'none';
     }
 
-    // بلافاصله و با هر تغییر DOM
     updateGapControlsVisibility();
     var gapObserver = new MutationObserver(updateGapControlsVisibility);
     gapObserver.observe(document.body, { childList: true, subtree: true });
@@ -404,5 +403,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (gap controls dynamic visibility)');
+    console.log('Govahi UI Panel ready. (flex gap controls)');
 })();
