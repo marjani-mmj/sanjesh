@@ -25,14 +25,14 @@
             baseWidth = target.getBoundingClientRect().width;
         }
 
-        // ۲. رفع محدودیت‌های ارتفاع، overflow و max-width
+        // ۲. رفع محدودیت‌ها
         target.style.setProperty('max-height', 'none', 'important');
         target.style.setProperty('max-width', 'none', 'important');
         target.style.setProperty('overflow', 'visible', 'important');
         target.style.setProperty('margin', '0', 'important');
         target.style.setProperty('padding', '0', 'important');
 
-        // ۳. اعمال عرض
+        // ۳. عرض کل
         var newWidth = baseWidth + settings.widthOffset;
         target.style.setProperty('width', newWidth + 'px', 'important');
 
@@ -50,13 +50,11 @@
         // ۶. فاصلهٔ افقی با Flexbox و column-gap
         var row = target.querySelector('.row.printt');
         if (row) {
-            // فعال‌سازی مجدد Flex (پیش‌فرض Bootstrap)
             row.style.display = 'flex';
             row.style.flexWrap = 'wrap';
-            row.style.columnGap = settings.cardGapH + 'px';   // فاصلهٔ افقی
-            row.style.rowGap = '0';                           // فاصلهٔ عمودی توسط margin کنترل می‌شود
+            row.style.columnGap = settings.cardGapH + 'px';
+            row.style.rowGap = '0';   // فاصلهٔ عمودی با margin کنترل می‌شود
 
-            // محاسبه عرض جدید برای هر کارت
             var newCardWidth = 'calc((100% - ' + settings.cardGapH + 'px) / 2)';
 
             allCards.forEach(function(card) {
@@ -64,7 +62,7 @@
                     card.style.width = newCardWidth;
                     card.style.maxWidth = newCardWidth;
                     card.style.flex = '0 0 ' + newCardWidth;
-                    card.style.marginLeft = '';   // حذف margin-left قبلی
+                    card.style.marginLeft = '';
                 } else {
                     // بازگشت به پیش‌فرض Bootstrap
                     card.style.width = '';
@@ -75,7 +73,16 @@
             });
         }
 
-        // ۷. دکمهٔ چاپ (فوتر)
+        // ۷. اطمینان از عرض ۱۰۰٪ المان‌های فوتر درون هر کارت
+        var footerRows = target.querySelectorAll('.row.panel-footer-report');
+        footerRows.forEach(function(ft) {
+            ft.style.setProperty('width', '100%', 'important');
+            ft.style.setProperty('box-sizing', 'border-box', 'important');
+            // رفع float در صورت لزوم (اختیاری)
+            ft.style.float = 'none';
+        });
+
+        // ۸. دکمهٔ چاپ (فوتر مودال)
         var modalContent = target.closest('.modal-content');
         if (modalContent) {
             var footer = modalContent.querySelector('.modal-footer');
@@ -147,7 +154,7 @@
         document.getElementById('govahi-cardGap-inc')?.addEventListener('click', function() { settings.cardGap += 1; refresh(); });
         document.getElementById('govahi-cardGap-inc5')?.addEventListener('click', function() { settings.cardGap += 5; refresh(); });
 
-        // ---- فاصلهٔ افقی (column-gap) ----
+        // ---- فاصلهٔ افقی ----
         document.getElementById('govahi-cardGapH-dec5')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 5); refresh(); });
         document.getElementById('govahi-cardGapH-dec')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 1); refresh(); });
         document.getElementById('govahi-cardGapH-inc')?.addEventListener('click', function() { settings.cardGapH += 1; refresh(); });
@@ -173,5 +180,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (column-gap, both cards shrink)');
+    console.log('✅ print-settings module loaded. (footer width 100%, both cards shrink)');
 })();
