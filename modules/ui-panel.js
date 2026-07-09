@@ -77,6 +77,24 @@
         }
         #govahi-panel .separator { border-top: 1px solid #dee2e6; margin: 10px 0; }
         #govahi-panel .status { font-size: 12px; color: #28a745; margin-top: 5px; text-align: center; }
+
+        /* دکمه‌های عملیات */
+        #govahi-panel .action-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        #govahi-panel .action-row .action-btn {
+            flex: 1;
+            margin-bottom: 0;  /* حذف margin-bottom پیش‌فرض */
+        }
+        #govahi-panel button.action-btn {
+            width: 100%; padding: 6px; margin-bottom: 6px;
+            background: #007bff; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+        #govahi-panel button.action-btn:disabled { background: #6c757d; cursor: not-allowed; }
+
         #govahi-floating-toggle {
             position: fixed; bottom: 20px; left: 20px;
             z-index: 999999; width: 48px; height: 48px;
@@ -88,12 +106,6 @@
             user-select: none; transition: transform 0.2s;
         }
         #govahi-floating-toggle:hover { transform: scale(1.1); }
-        #govahi-panel button.action-btn {
-            width: 100%; padding: 6px; margin-bottom: 6px;
-            background: #007bff; color: white; border: none;
-            border-radius: 4px; cursor: pointer; font-weight: bold;
-        }
-        #govahi-panel button.action-btn:disabled { background: #6c757d; cursor: not-allowed; }
     `;
     document.head.appendChild(style);
 
@@ -113,6 +125,7 @@
             <span class="close-btn" id="govahi-close-btn">&times;</span>
         </div>
         <div class="panel-body">
+            <!-- بخش تنظیمات چاپ -->
             <div class="section-title">📏 حاشیه‌ها و بزرگنمایی</div>
 
             <div class="row-control">
@@ -160,9 +173,13 @@
 
             <div class="separator"></div>
 
+            <!-- بخش عملیات گواهینامه -->
             <div class="section-title">📋 عملیات گواهینامه</div>
-            <button class="action-btn" id="govahi-extract-btn">📋 استخراج و هایلایت</button>
-            <button class="action-btn" id="govahi-send-to-api-btn" disabled>📤 ارسال به API</button>
+            <!-- دکمه‌ها در یک ردیف با اندازهٔ مساوی -->
+            <div class="action-row" id="govahi-action-row">
+                <button class="action-btn" id="govahi-extract-btn">📋 شناسایی</button>
+                <button class="action-btn" id="govahi-send-to-api-btn" disabled>📤 ارسال به سنجش</button>
+            </div>
             <div class="status" id="govahi-status-msg"></div>
 
             <div style="margin-top:10px; text-align:center; font-size:11px; color:#adb5bd;">
@@ -260,7 +277,7 @@
 
     document.getElementById('govahi-applySettingsBtn').addEventListener('click', applySettings);
 
-    // ========== API عمومی ==========
+    // ========== API عمومی (برای govahiM1.js) ==========
     GovahiApp.ui = {
         togglePanel: function() {
             if (panel.style.display === 'none') {
@@ -293,5 +310,6 @@
         }
     };
 
+    // مقداردهی اولیه نمایشگرها
     updateDisplay();
 })();
