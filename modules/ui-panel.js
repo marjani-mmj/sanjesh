@@ -71,6 +71,14 @@
             display: none;
         }
 
+        /* کنترل‌های فاصله (فقط در صفحهٔ گواهینامه) */
+        #govahi-gap-controls {
+            display: none;  /* پیش‌فرض مخفی */
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ccc;
+        }
+
         /* ورودی‌های همیشگی */
         #govahi-panel .manual-fields {
             margin-top: 8px;
@@ -190,7 +198,7 @@
                     <button class="ctrl-btn" id="govahi-offsetY-up-inc">+</button>
                     <button class="ctrl-btn coarse-inc" id="govahi-offsetY-up-inc5">+۵</button>
                 </div>
-                <!-- ردیف راست (صحافی) -->
+                <!-- ردیف راست -->
                 <div class="row-control">
                     <span class="label">راست</span>
                     <button class="ctrl-btn coarse-dec" id="govahi-offsetX-right-dec5">−۵</button>
@@ -208,15 +216,6 @@
                     <button class="ctrl-btn" id="govahi-width-inc">+</button>
                     <button class="ctrl-btn coarse-inc" id="govahi-width-inc5">+۵</button>
                 </div>
-                <!-- ردیف فاصله کارت‌ها (جدید) -->
-                <div class="row-control">
-                    <span class="label">فاصله</span>
-                    <button class="ctrl-btn coarse-dec" id="govahi-cardGap-dec5">−۵</button>
-                    <button class="ctrl-btn" id="govahi-cardGap-dec">−</button>
-                    <span class="value-display" id="govahi-cardGap-val">0</span>
-                    <button class="ctrl-btn" id="govahi-cardGap-inc">+</button>
-                    <button class="ctrl-btn coarse-inc" id="govahi-cardGap-inc5">+۵</button>
-                </div>
                 <!-- ردیف بزرگنمایی -->
                 <div class="row-control">
                     <span class="label">Zoom</span>
@@ -226,10 +225,33 @@
                     <button class="ctrl-btn" id="govahi-scale-in">+</button>
                     <button class="ctrl-btn coarse-inc" id="govahi-scale-in5">+۵</button>
                 </div>
-                <!-- دکمهٔ تنظیم مجدد مدرن -->
+                <!-- دکمهٔ تنظیم مجدد -->
                 <button class="reset-btn" id="govahi-reset-settings-btn">
                     <i class="fas fa-redo-alt"></i> تنظیم مجدد
                 </button>
+            </div>
+
+            <!-- کنترل‌های فاصلهٔ کارت‌ها (فقط در صفحهٔ گواهینامه) -->
+            <div id="govahi-gap-controls">
+                <div class="section-title" style="margin-top:5px;">📐 فاصلهٔ کارت‌ها</div>
+                <!-- فاصلهٔ عمودی -->
+                <div class="row-control">
+                    <span class="label">↕️ عمودی</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-cardGap-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-cardGap-dec">−</button>
+                    <span class="value-display" id="govahi-cardGap-val">0</span>
+                    <button class="ctrl-btn" id="govahi-cardGap-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-cardGap-inc5">+۵</button>
+                </div>
+                <!-- فاصلهٔ افقی -->
+                <div class="row-control">
+                    <span class="label">↔️ افقی</span>
+                    <button class="ctrl-btn coarse-dec" id="govahi-cardGapH-dec5">−۵</button>
+                    <button class="ctrl-btn" id="govahi-cardGapH-dec">−</button>
+                    <span class="value-display" id="govahi-cardGapH-val">0</span>
+                    <button class="ctrl-btn" id="govahi-cardGapH-inc">+</button>
+                    <button class="ctrl-btn coarse-inc" id="govahi-cardGapH-inc5">+۵</button>
+                </div>
             </div>
 
             <!-- ورودی‌های شماره شروع و تاریخ -->
@@ -316,6 +338,19 @@
         });
     })();
 
+    // ========== نمایش/مخفی‌سازی کنترل‌های فاصله بر اساس صفحه ==========
+    function updateGapControlsVisibility() {
+        var gapDiv = document.getElementById('govahi-gap-controls');
+        if (!gapDiv) return;
+        var isCertPage = document.querySelectorAll('#print-content .col-md-6').length > 0;
+        gapDiv.style.display = isCertPage ? 'block' : 'none';
+    }
+
+    // بلافاصله و با هر تغییر DOM
+    updateGapControlsVisibility();
+    var gapObserver = new MutationObserver(updateGapControlsVisibility);
+    gapObserver.observe(document.body, { childList: true, subtree: true });
+
     // ========== اتصال کنترل‌های چاپ ==========
     if (GovahiApp.printSettings && typeof GovahiApp.printSettings.bindControls === 'function') {
         GovahiApp.printSettings.bindControls();
@@ -369,5 +404,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (card gap row added)');
+    console.log('Govahi UI Panel ready. (gap controls dynamic visibility)');
 })();
