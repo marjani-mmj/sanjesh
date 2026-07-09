@@ -1,3 +1,4 @@
+// C:\Users\manager\Desktop\sida cod\govahiM1\modules\config.js
 (function() {
     'use strict';
     window.GovahiApp = window.GovahiApp || {};
@@ -16,10 +17,12 @@
             tableBody: '.modal-body tbody tr',
             regionIdLabel: '.school-info .infomark.ng-binding[ng-bind="$root.userContext.regionId"]'
         },
-        defaultApiUrl: '', // کاربر بعداً می‌تواند در پنل وارد کند
+        defaultApiUrl: '',
         style: {
             extractedRow: 'extracted-row',
             rowBgColor: '#d4edda'
-        }
+        },
+        // لیست کد مناطق مجاز برای استفاده از API
+        authorizedRegions: ['1698']
     };
 })();
