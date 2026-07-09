@@ -1,7 +1,7 @@
 /**
  * ==========================================================
- * C:\Users\manager\Desktop\sida cod\govahiM1\modules\certificate-filler.js
- * پرکنندهٔ خودکار شماره گواهینامه و تاریخ از API + کش محلی
+ * modules/certificate-filler.js
+ * پرکنندهٔ خودکار شماره گواهینامه و تاریخ از API
  * ==========================================================
  */
 (function () {
@@ -59,7 +59,6 @@
             return response.json();
         })
         .then(function (data) {
-            // ساختار پاسخ: { found: true, شماره_گواهینامه: "...", تاریخ_صدور: "..." }
             if (data.found) {
                 return {
                     number: data.شماره_گواهینامه,
@@ -101,7 +100,6 @@
                 // ۲. API
                 return fetchCertificateInfo(nationalCode).then(function (info) {
                     fetched++;
-                    // ذخیره در کش
                     saveToCache(nationalCode, info.number, info.date);
                     return info;
                 });
@@ -137,25 +135,22 @@
         });
     };
 
-    // ========== افزودن دکمه به پنل (در صورت وجود) ==========
+    // ========== افزودن دکمه به پنل ==========
     function addButtonToPanel() {
-        // منتظر بمانیم تا پنل ساخته شود (ui-panel.js بعد از بارگذاری اجرا می‌شود)
         var checkInterval = setInterval(function () {
             var panel = document.getElementById('govahi-panel');
             if (panel) {
                 clearInterval(checkInterval);
-                // جلوگیری از اضافه شدن چندباره
                 if (document.getElementById('govahi-fill-btn')) return;
 
-                // پیدا کردن بخش عملیات گواهینامه
                 var actionSection = panel.querySelector('.panel-body');
                 if (!actionSection) return;
 
                 var btn = document.createElement('button');
                 btn.id = 'govahi-fill-btn';
                 btn.className = 'action-btn';
-                btn.textContent = '🔢 دریافت شماره گواهینامه';
-                btn.title = 'دریافت و پر کردن شماره گواهینامه و تاریخ از API';
+                btn.textContent = '🔢 پر کردن گواهینامه‌ها';
+                btn.title = 'دریافت شماره گواهینامه و تاریخ از API و پر کردن کارت‌ها';
                 btn.style.backgroundColor = '#10b981';
 
                 btn.addEventListener('click', function () {
@@ -170,12 +165,11 @@
                     actionSection.appendChild(btn);
                 }
 
-                console.log('✅ دکمه گواهینامه به پنل اضافه شد.');
+                console.log('✅ دکمه پر کردن گواهینامه‌ها به پنل اضافه شد.');
             }
         }, 300);
     }
 
-    // اجرای افزودن دکمه پس از آماده‌سازی کامل DOM
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', addButtonToPanel);
     } else {
