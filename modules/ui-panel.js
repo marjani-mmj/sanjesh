@@ -65,7 +65,7 @@
         }
         #govahi-panel .collapsible-content {
             padding: 0 0 4px 0;
-            display: block; /* پیش‌فرض باز (با کلاس collapsed پنهان می‌شود) */
+            display: block;
         }
         #govahi-panel .collapsible-content.collapsed {
             display: none;
@@ -145,9 +145,10 @@
             <span class="close-btn" id="govahi-close-btn">&times;</span>
         </div>
         <div class="panel-body">
-            <!-- بخش تنظیمات چاپ (جمع‌شو) -->
-            <div class="collapsible-header collapsed" id="govahi-print-settings-toggle">
-                <span>📏 تنظیمات چاپ</span>
+            <!-- بخش تنظیمات چاپ (جمع‌شو) با onclick inline -->
+            <div class="collapsible-header collapsed" id="govahi-print-settings-toggle"
+                 onclick="var content=document.getElementById('govahi-print-settings-content'); content.classList.toggle('collapsed'); this.classList.toggle('collapsed');">
+                <span>📏 حاشیه‌ها و بزرگنمایی</span>
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="collapsible-content collapsed" id="govahi-print-settings-content">
@@ -265,26 +266,6 @@
         });
     })();
 
-    // ========== باز و بسته شدن تنظیمات چاپ (ساده‌شده) ==========
-    var printSettingsToggle = document.getElementById('govahi-print-settings-toggle');
-    var printSettingsContent = document.getElementById('govahi-print-settings-content');
-    if (printSettingsToggle && printSettingsContent) {
-        printSettingsToggle.addEventListener('click', function(e) {
-            // جلوگیری از باز شدن همزمان با کلیک روی دکمه‌های داخل header (ندارد)
-            e.stopPropagation();
-            var isContentHidden = printSettingsContent.classList.contains('collapsed');
-            if (isContentHidden) {
-                // باز کردن
-                printSettingsContent.classList.remove('collapsed');
-                printSettingsToggle.classList.remove('collapsed');
-            } else {
-                // بستن
-                printSettingsContent.classList.add('collapsed');
-                printSettingsToggle.classList.add('collapsed');
-            }
-        });
-    }
-
     // ========== اتصال کنترل‌های چاپ از ماژول print-settings ==========
     if (GovahiApp.printSettings && typeof GovahiApp.printSettings.bindControls === 'function') {
         GovahiApp.printSettings.bindControls();
@@ -338,5 +319,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (collapsible fixed)');
+    console.log('Govahi UI Panel ready. (inline onclick for collapsible)');
 })();
