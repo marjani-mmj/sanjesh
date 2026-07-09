@@ -106,11 +106,15 @@
             display: none;
         }
 
-        /* ورودی‌های دستی همیشگی */
+        /* ورودی‌های همیشگی (در یک ردیف) */
         #govahi-panel .manual-fields {
             margin-top: 8px;
             padding-top: 8px;
             border-top: 1px dashed #ccc;
+        }
+        #govahi-panel .manual-fields .row-control {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
         }
         #govahi-panel .manual-fields .row-control .label {
             width: auto;
@@ -225,15 +229,13 @@
                 <button class="apply-btn" id="govahi-applySettingsBtn">اعمال تنظیمات</button>
             </div>
 
-            <!-- ورودی‌های شماره شروع و تاریخ (همیشه نمایش) -->
+            <!-- ورودی‌های شماره شروع و تاریخ (در یک ردیف) -->
             <div class="manual-fields">
                 <div class="row-control">
                     <span class="label">شماره شروع:</span>
                     <input type="number" id="govahi-start-number" min="1" value="1" />
-                </div>
-                <div class="row-control">
-                    <span class="label">تاریخ صدور:</span>
-                    <input type="text" id="govahi-issue-date" placeholder="1402/01/01" />
+                    <span class="label" style="margin-right:10px;">تاریخ:</span>
+                    <input type="text" id="govahi-issue-date" placeholder="روز/ماه/سال" style="direction: rtl; text-align: right; width:90px;" />
                 </div>
             </div>
 
