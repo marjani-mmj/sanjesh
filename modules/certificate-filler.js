@@ -1,7 +1,8 @@
 /**
  * ==========================================================
  * modules/certificate-filler.js
- * دکمهٔ «پر کردن گواهینامه‌ها» در پنل – دریافت از API
+ * دکمهٔ «پر کردن گواهینامه‌ها» در پنل – دریافت شماره و تاریخ از API
+ * فقط با کلیک کاربر اجرا می‌شود، هرگز خودکار.
  * ==========================================================
  */
 (function () {
@@ -9,7 +10,7 @@
 
     window.GovahiApp = window.GovahiApp || {};
 
-    // ========== ابزارها ==========
+    // ========== ابزارهای عمومی ==========
     function extractNationalCode(card) {
         var labels = card.querySelectorAll(".textt label");
         for (var i = 0; i < labels.length; i++) {
@@ -70,7 +71,7 @@
         });
     }
 
-    // ========== عملیات اصلی ==========
+    // ========== عملیات اصلی (فقط با کلیک دکمه) ==========
     GovahiApp.fillCertificates = function () {
         var cards = document.querySelectorAll("#print-content .col-md-6");
         if (cards.length === 0) {
@@ -91,13 +92,11 @@
             }
 
             var promise = Promise.resolve().then(function () {
-                // ۱. کش محلی
                 var cachedData = getFromCache(nationalCode);
                 if (cachedData) {
                     cached++;
                     return cachedData;
                 }
-                // ۲. API
                 return fetchCertificateInfo(nationalCode).then(function (info) {
                     fetched++;
                     saveToCache(nationalCode, info.number, info.date);
@@ -135,7 +134,7 @@
         });
     };
 
-    // ========== افزودن دکمه به پنل ==========
+    // ========== افزودن دکمه به پنل (فقط یکبار) ==========
     function addButtonToPanel() {
         var checkInterval = setInterval(function () {
             var panel = document.getElementById('govahi-panel');
@@ -150,14 +149,13 @@
                 btn.id = 'govahi-fill-btn';
                 btn.className = 'action-btn';
                 btn.textContent = '🔢 پر کردن گواهینامه‌ها';
-                btn.title = 'دریافت شماره گواهینامه و تاریخ از API';
+                btn.title = 'دریافت شماره گواهینامه و تاریخ از API (کلیک کنید)';
                 btn.style.backgroundColor = '#10b981';
 
                 btn.addEventListener('click', function () {
                     GovahiApp.fillCertificates();
                 });
 
-                // درج بعد از دکمهٔ «ارسال به API»
                 var sendBtn = document.getElementById('govahi-send-to-api-btn');
                 if (sendBtn) {
                     sendBtn.parentNode.insertBefore(btn, sendBtn.nextSibling);
@@ -170,7 +168,6 @@
         }, 300);
     }
 
-    // اجرای افزودن دکمه بعد از آماده‌سازی DOM
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', addButtonToPanel);
     } else {
