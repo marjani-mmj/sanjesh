@@ -60,11 +60,8 @@
 
             // ---------- تابع پاک‌سازی کامل حافظه و کش ----------
             function clearAllPreviousData() {
-                // 1. پاک کردن شیء استخراج‌شده
                 window.extractedData = null;
                 GovahiApp.isRegionAuthorized = undefined;
-
-                // 2. پاک کردن تمام کش localStorage مربوط به گواهینامه‌ها
                 var keysToRemove = [];
                 for (var i = 0; i < localStorage.length; i++) {
                     var key = localStorage.key(i);
@@ -123,10 +120,8 @@
                     return;
                 }
 
-                // پاک‌سازی کامل قبل از استخراج جدید
                 clearAllPreviousData();
 
-                // تزریق استایل چاپ
                 if (!document.getElementById('govahi-print-style')) {
                     var printStyle = document.createElement('style');
                     printStyle.id = 'govahi-print-style';
@@ -178,10 +173,8 @@
                     return;
                 }
 
-                // قبل از اختصاص محلی، داده‌های قبلی را پاک می‌کنیم
                 clearAllPreviousData();
 
-                // دوباره استخراج می‌کنیم (تا داده‌های خام اولیه را داشته باشیم)
                 var header = GovahiApp.extractor.extractHeader();
                 var students = GovahiApp.extractor.extractStudents();
                 window.extractedData = { header: header, students: students };
@@ -240,6 +233,8 @@
                             });
                             if (student) {
                                 student.شماره_گواهینامه = cert.شماره_گواهینامه;
+                                student.تاریخ_صدور = cert.تاریخ_صدور;   // ✅ اصلاح: ذخیره تاریخ
+
                                 var idx = students.indexOf(student);
                                 if (rows[idx]) {
                                     var certCell = rows[idx].querySelectorAll('td')[11];
@@ -267,10 +262,8 @@
                     return;
                 }
 
-                // پاک‌سازی کامل قبل از ارسال (تا داده‌های قدیمی تداخل نکنند)
                 clearAllPreviousData();
 
-                // دوباره استخراج می‌کنیم (چون clear داده‌ها را null کرده بود)
                 var header = GovahiApp.extractor.extractHeader();
                 var students = GovahiApp.extractor.extractStudents();
                 window.extractedData = { header: header, students: students };
@@ -280,7 +273,7 @@
 
             updateButtonStates();
 
-            console.log('GovahiApp ready. (با پاک‌سازی خودکار قبل از عملیات)');
+            console.log('GovahiApp ready. (تاریخ صدور در دانش‌آموز ذخیره می‌شود)');
             return;
         }
 
