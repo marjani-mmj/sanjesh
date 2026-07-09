@@ -5,12 +5,12 @@
 
     // ========== State ==========
     var settings = {
-        offsetX: 0,
-        offsetY: 0,
-        scale: 1,
-        widthOffset: 0,
-        cardGap: 0,
-        cardGapH: 0
+        offsetX: 0,        // حاشیهٔ صحافی راست (پیکسل)
+        offsetY: 0,        // جابه‌جایی عمودی (پیکسل)
+        scale: 1,          // بزرگنمایی (۱ = ۱۰۰٪)
+        widthOffset: 0,    // افزایش/کاهش عرض بر حسب پیکسل
+        cardGap: 0,        // فاصلهٔ عمودی بین کارت‌ها (پیکسل)
+        cardGapH: 0        // فاصلهٔ افقی بین کارت‌ها (پیکسل)
     };
 
     var baseWidth = null;
@@ -20,67 +20,57 @@
         var target = document.getElementById('print-content');
         if (!target || !document.body.contains(target)) return;
 
+        // ۱. ذخیره عرض اولیه
         if (baseWidth === null) {
             baseWidth = target.getBoundingClientRect().width;
         }
 
-        // رفع محدودیت‌ها
+        // ۲. رفع محدودیت‌ها
         target.style.setProperty('max-height', 'none', 'important');
-        target.style.setProperty('max-width', 'none', 'important');
+        target.style.setProperty('max-width', 'none', 'important');   // افزایش بدون محدودیت
         target.style.setProperty('overflow', 'visible', 'important');
         target.style.setProperty('margin', '0', 'important');
         target.style.setProperty('padding', '0', 'important');
 
-        // عرض
+        // ۳. عرض
         var newWidth = baseWidth + settings.widthOffset;
         target.style.setProperty('width', newWidth + 'px', 'important');
 
-        // transform
+        // ۴. transform ترکیبی
         var transformValue = 'translate(' + (-settings.offsetX) + 'px, ' + settings.offsetY + 'px) scale(' + settings.scale + ')';
         target.style.setProperty('transform', transformValue, 'important');
         target.style.setProperty('transform-origin', 'top right', 'important');
 
-        // فاصلهٔ عمودی
+        // ۵. فاصلهٔ عمودی (margin-bottom)
         var allCards = target.querySelectorAll('.col-md-6');
         allCards.forEach(function(card) {
             card.style.marginBottom = settings.cardGap + 'px';
         });
 
-        // فاصلهٔ افقی
+        // ۶. فاصلهٔ افقی: بازنویسی کامل Flexbox Bootstrap
         var row = target.querySelector('.row.printt');
         if (row) {
-            if (settings.cardGapH > 0) {
-                // فعال‌سازی grid با column-gap
-                row.style.display = 'grid';
-                row.style.gridTemplateColumns = '1fr 1fr';
-                row.style.gap = '';                   // پاک‌سازی gap احتمالی
-                row.style.columnGap = settings.cardGapH + 'px';
-                row.style.rowGap = '0';
-                row.style.alignItems = 'start';
-                allCards.forEach(function(card) {
-                    card.style.width = '';
+            // غیرفعال کردن Flex – استفاده از float اصلی
+            row.style.display = 'block';   // block، نه flex
+
+            allCards.forEach(function(card, index) {
+                if (settings.cardGapH > 0 && index % 2 === 1) {
+                    // کارت سمت چپ (ایندکس فرد)
+                    card.style.marginLeft = settings.cardGapH + 'px';
+                    card.style.width      = 'calc(50% - ' + settings.cardGapH + 'px)';
+                    card.style.maxWidth   = 'calc(50% - ' + settings.cardGapH + 'px)';
+                    card.style.flex       = '0 0 calc(50% - ' + settings.cardGapH + 'px)';
+                } else {
+                    // کارت راست، یا حالت بدون فاصله
                     card.style.marginLeft = '';
-                    card.style.flex = '';
-                });
-                console.log('📏 فاصله افقی تنظیم شد:', settings.cardGapH + 'px');
-            } else {
-                // بازگشت به حالت اولیه (float)
-                row.style.display = '';
-                row.style.gridTemplateColumns = '';
-                row.style.gap = '';
-                row.style.columnGap = '';
-                row.style.rowGap = '';
-                row.style.alignItems = '';
-                allCards.forEach(function(card) {
-                    card.style.width = '';
-                    card.style.marginLeft = '';
-                    card.style.flex = '';
-                });
-                console.log('📏 فاصله افقی غیرفعال شد.');
-            }
+                    card.style.width      = '';
+                    card.style.maxWidth   = '';
+                    card.style.flex       = '';
+                }
+            });
         }
 
-        // دکمهٔ چاپ
+        // ۷. دکمهٔ چاپ (فوتر)
         var modalContent = target.closest('.modal-content');
         if (modalContent) {
             var footer = modalContent.querySelector('.modal-footer');
@@ -128,48 +118,49 @@
 
     // ========== اتصال دکمه‌ها ==========
     function bindControls() {
-        // بالا
+        // ---- بالا ----
         document.getElementById('govahi-offsetY-up-dec5')?.addEventListener('click', function() { settings.offsetY -= 5; refresh(); });
         document.getElementById('govahi-offsetY-up-dec')?.addEventListener('click', function() { settings.offsetY -= 1; refresh(); });
         document.getElementById('govahi-offsetY-up-inc')?.addEventListener('click', function() { settings.offsetY += 1; refresh(); });
         document.getElementById('govahi-offsetY-up-inc5')?.addEventListener('click', function() { settings.offsetY += 5; refresh(); });
 
-        // راست
+        // ---- راست ----
         document.getElementById('govahi-offsetX-right-dec5')?.addEventListener('click', function() { settings.offsetX -= 5; refresh(); });
         document.getElementById('govahi-offsetX-right-dec')?.addEventListener('click', function() { settings.offsetX -= 1; refresh(); });
         document.getElementById('govahi-offsetX-right-inc')?.addEventListener('click', function() { settings.offsetX += 1; refresh(); });
         document.getElementById('govahi-offsetX-right-inc5')?.addEventListener('click', function() { settings.offsetX += 5; refresh(); });
 
-        // پهنا
+        // ---- پهنا ----
         document.getElementById('govahi-width-dec5')?.addEventListener('click', function() { settings.widthOffset -= 5; refresh(); });
         document.getElementById('govahi-width-dec')?.addEventListener('click', function() { settings.widthOffset -= 1; refresh(); });
         document.getElementById('govahi-width-inc')?.addEventListener('click', function() { settings.widthOffset += 1; refresh(); });
         document.getElementById('govahi-width-inc5')?.addEventListener('click', function() { settings.widthOffset += 5; refresh(); });
 
-        // فاصلهٔ عمودی
+        // ---- فاصلهٔ عمودی ----
         document.getElementById('govahi-cardGap-dec5')?.addEventListener('click', function() { settings.cardGap -= 5; refresh(); });
         document.getElementById('govahi-cardGap-dec')?.addEventListener('click', function() { settings.cardGap -= 1; refresh(); });
         document.getElementById('govahi-cardGap-inc')?.addEventListener('click', function() { settings.cardGap += 1; refresh(); });
         document.getElementById('govahi-cardGap-inc5')?.addEventListener('click', function() { settings.cardGap += 5; refresh(); });
 
-        // فاصلهٔ افقی (با اطمینان از غیرمنفی بودن)
+        // ---- فاصلهٔ افقی ----
         document.getElementById('govahi-cardGapH-dec5')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 5); refresh(); });
         document.getElementById('govahi-cardGapH-dec')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 1); refresh(); });
         document.getElementById('govahi-cardGapH-inc')?.addEventListener('click', function() { settings.cardGapH += 1; refresh(); });
         document.getElementById('govahi-cardGapH-inc5')?.addEventListener('click', function() { settings.cardGapH += 5; refresh(); });
 
-        // بزرگنمایی
+        // ---- بزرگنمایی ----
         document.getElementById('govahi-scale-out5')?.addEventListener('click', function() { settings.scale = Math.max(0.5, settings.scale - 0.05); refresh(); });
         document.getElementById('govahi-scale-out')?.addEventListener('click', function() { settings.scale = Math.max(0.5, settings.scale - 0.01); refresh(); });
         document.getElementById('govahi-scale-in')?.addEventListener('click', function() { settings.scale = Math.min(2, settings.scale + 0.01); refresh(); });
         document.getElementById('govahi-scale-in5')?.addEventListener('click', function() { settings.scale = Math.min(2, settings.scale + 0.05); refresh(); });
 
-        // تنظیم مجدد
+        // ---- تنظیم مجدد ----
         document.getElementById('govahi-reset-settings-btn')?.addEventListener('click', reset);
 
         updateDisplay();
     }
 
+    // ========== API عمومی ==========
     GovahiApp.printSettings = {
         apply: apply,
         reset: reset,
@@ -177,5 +168,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (clean grid gap)');
+    console.log('✅ print-settings module loaded. (flex overwrite fix)');
 })();
