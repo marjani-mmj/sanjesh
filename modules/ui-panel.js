@@ -115,6 +115,34 @@
         }
         #govahi-panel button.action-btn:disabled { background: #6c757d; cursor: not-allowed; }
 
+        /* دکمهٔ تنظیم مجدد مدرن */
+        #govahi-panel .reset-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 8px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        #govahi-panel .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        #govahi-panel .reset-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         #govahi-floating-toggle {
             position: fixed; bottom: 20px; left: 20px;
             z-index: 999999; width: 48px; height: 48px;
@@ -188,7 +216,10 @@
                     <button class="ctrl-btn" id="govahi-scale-in">+</button>
                     <button class="ctrl-btn coarse-inc" id="govahi-scale-in5">+۵</button>
                 </div>
-                <button class="apply-btn" id="govahi-reset-settings-btn" style="background:#6c757d;">↺ تنظیم مجدد</button>
+                <!-- دکمهٔ تنظیم مجدد مدرن -->
+                <button class="reset-btn" id="govahi-reset-settings-btn">
+                    <i class="fas fa-redo-alt"></i> تنظیم مجدد
+                </button>
             </div>
 
             <!-- ورودی‌های شماره شروع و تاریخ -->
@@ -328,5 +359,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (bottom row completely removed)');
+    console.log('Govahi UI Panel ready. (modern reset button)');
 })();
