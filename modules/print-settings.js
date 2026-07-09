@@ -29,7 +29,6 @@
         }
 
         // transform ترکیبی
-        // offsetX مثبت → translateX منفی (گزارش به چپ می‌رود، فضای صحافی راست بیشتر می‌شود)
         var transformValue = 'translate(' + (-settings.offsetX) + 'px, ' + settings.offsetY + 'px) scale(' + settings.scale + ')';
         target.style.setProperty('transform', transformValue, 'important');
         target.style.setProperty('transform-origin', 'top right', 'important');
@@ -43,7 +42,7 @@
         var sc = document.getElementById('govahi-scale-val');
         var wd = document.getElementById('govahi-width-val');
 
-        if (ox) ox.textContent = settings.offsetX;   // عدد مثبت
+        if (ox) ox.textContent = settings.offsetX;
         if (oy) oy.textContent = settings.offsetY;
         if (sc) sc.textContent = Math.round(settings.scale * 100) + '%';
         if (wd) wd.textContent = settings.widthOffset;
@@ -61,7 +60,7 @@
         refresh();
     }
 
-    // ========== اتصال دکمه‌ها ==========
+    // ========== اتصال دکمه‌ها (بدون ردیف پایین) ==========
     function bindControls() {
         // ---- ردیف بالا ----
         document.getElementById('govahi-offsetY-up-dec5')?.addEventListener('click', function() { settings.offsetY -= 5; refresh(); });
@@ -107,5 +106,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded. (right margin positive, bottom row removed)');
+    console.log('✅ print-settings module loaded. (bottom row removed)');
 })();
