@@ -403,5 +403,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (flex gap controls)');
+    console.log('Govahi UI Panel ready.');
 })();
