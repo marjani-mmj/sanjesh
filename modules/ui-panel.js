@@ -299,7 +299,7 @@
             <div class="status" id="govahi-status-msg"></div>
 
             <!-- لینک ابزارهای بیشتر در کهکشان‌سافت -->
-            <a href="https://kahkeshansoft.ir" target="_blank" class="govahi-more-tools-btn">
+            <a href="http://kahkeshansoft.ir" target="_blank" class="govahi-more-tools-btn">
                 🔗 ابزارهای بیشتر در کهکشان‌سافت
             </a>
 
