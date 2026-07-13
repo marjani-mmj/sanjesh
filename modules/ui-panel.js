@@ -1,4 +1,4 @@
-// C:\Users\manager\Desktop\sida cod\govahiM1\modules\ui-panel.js
+// modules/ui-panel.js
 (function() {
     'use strict';
     window.GovahiApp = window.GovahiApp || {};
@@ -151,6 +151,25 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
+        /* لینک ابزارهای بیشتر */
+        .govahi-more-tools-btn {
+            display: block;
+            text-align: center;
+            margin: 10px 0 8px;
+            padding: 8px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .govahi-more-tools-btn:hover {
+            background: #e0e0e0;
+            color: #000;
+        }
+
         #govahi-floating-toggle {
             position: fixed; bottom: 20px; left: 20px;
             z-index: 1055;
@@ -279,6 +298,11 @@
 
             <div class="status" id="govahi-status-msg"></div>
 
+            <!-- لینک ابزارهای بیشتر در کهکشان‌سافت -->
+            <a href="https://kahkeshansoft.ir" target="_blank" class="govahi-more-tools-btn">
+                🔗 ابزارهای بیشتر در کهکشان‌سافت
+            </a>
+
             <div style="margin-top:10px; text-align:center; font-size:11px; color:#adb5bd;">
                 آموزش و پرورش خلیل آباد<br>کارشناسی سنجش
             </div>
@@ -286,6 +310,7 @@
     `;
     document.body.appendChild(panel);
 
+    // ... (بقیه کدها مانند نمایش/مخفی، درگ، updateGapControlsVisibility، API و غیره بدون تغییر)
     // ========== نمایش / مخفی ==========
     var isPanelVisible = false;
     toggleIcon.addEventListener('click', function() {
@@ -403,5 +428,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready.');
+    console.log('Govahi UI Panel ready. (با لینک کهکشان‌سافت)');
 })();
