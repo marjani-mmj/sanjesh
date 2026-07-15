@@ -2,6 +2,18 @@
 (function() {
     'use strict';
     window.GovahiApp = window.GovahiApp || {};
-    var config = GovahiApp.config;
 
+    GovahiApp.extractor = {
+        extractHeader: function() {
+            // همیشه شیء خالی برمی‌گرداند
+            return {};
+        },
+        extractStudents: function() {
+            // همیشه آرایه خالی برمی‌گرداند
+            return [];
+        },
+        highlightRows: function() {
+            // هیچ ردیفی هایلایت نمی‌شود
+        }
+    };
 })();
