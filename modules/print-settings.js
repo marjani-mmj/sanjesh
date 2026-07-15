@@ -1,4 +1,3 @@
-// C:\Users\manager\Desktop\sida cod\govahiM1\modules\print-settings.js
 (function() {
     'use strict';
     window.GovahiApp = window.GovahiApp || {};
@@ -13,7 +12,6 @@
     };
 
     function apply() {
-        // هیچ استایلی تغییر نمی‌کند
         updateDisplay();
     }
 
@@ -44,32 +42,43 @@
     }
 
     function bindControls() {
-        // اتصال دکمه‌ها بدون تغییر واقعی
-        document.getElementById('govahi-offsetY-up-dec5')?.addEventListener('click', function() { settings.offsetY -= 5; updateDisplay(); });
-        document.getElementById('govahi-offsetY-up-dec')?.addEventListener('click', function() { settings.offsetY -= 1; updateDisplay(); });
-        document.getElementById('govahi-offsetY-up-inc')?.addEventListener('click', function() { settings.offsetY += 1; updateDisplay(); });
-        document.getElementById('govahi-offsetY-up-inc5')?.addEventListener('click', function() { settings.offsetY += 5; updateDisplay(); });
-        document.getElementById('govahi-offsetX-right-dec5')?.addEventListener('click', function() { settings.offsetX -= 5; updateDisplay(); });
-        document.getElementById('govahi-offsetX-right-dec')?.addEventListener('click', function() { settings.offsetX -= 1; updateDisplay(); });
-        document.getElementById('govahi-offsetX-right-inc')?.addEventListener('click', function() { settings.offsetX += 1; updateDisplay(); });
-        document.getElementById('govahi-offsetX-right-inc5')?.addEventListener('click', function() { settings.offsetX += 5; updateDisplay(); });
-        document.getElementById('govahi-width-dec5')?.addEventListener('click', function() { settings.widthOffset -= 5; updateDisplay(); });
-        document.getElementById('govahi-width-dec')?.addEventListener('click', function() { settings.widthOffset -= 1; updateDisplay(); });
-        document.getElementById('govahi-width-inc')?.addEventListener('click', function() { settings.widthOffset += 1; updateDisplay(); });
-        document.getElementById('govahi-width-inc5')?.addEventListener('click', function() { settings.widthOffset += 5; updateDisplay(); });
-        document.getElementById('govahi-cardGap-dec5')?.addEventListener('click', function() { settings.cardGap -= 5; updateDisplay(); });
-        document.getElementById('govahi-cardGap-dec')?.addEventListener('click', function() { settings.cardGap -= 1; updateDisplay(); });
-        document.getElementById('govahi-cardGap-inc')?.addEventListener('click', function() { settings.cardGap += 1; updateDisplay(); });
-        document.getElementById('govahi-cardGap-inc5')?.addEventListener('click', function() { settings.cardGap += 5; updateDisplay(); });
-        document.getElementById('govahi-cardGapH-dec5')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 5); updateDisplay(); });
-        document.getElementById('govahi-cardGapH-dec')?.addEventListener('click', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 1); updateDisplay(); });
-        document.getElementById('govahi-cardGapH-inc')?.addEventListener('click', function() { settings.cardGapH += 1; updateDisplay(); });
-        document.getElementById('govahi-cardGapH-inc5')?.addEventListener('click', function() { settings.cardGapH += 5; updateDisplay(); });
-        document.getElementById('govahi-scale-out5')?.addEventListener('click', function() { settings.scale = Math.max(0.5, settings.scale - 0.05); updateDisplay(); });
-        document.getElementById('govahi-scale-out')?.addEventListener('click', function() { settings.scale = Math.max(0.5, settings.scale - 0.01); updateDisplay(); });
-        document.getElementById('govahi-scale-in')?.addEventListener('click', function() { settings.scale = Math.min(2, settings.scale + 0.01); updateDisplay(); });
-        document.getElementById('govahi-scale-in5')?.addEventListener('click', function() { settings.scale = Math.min(2, settings.scale + 0.05); updateDisplay(); });
-        document.getElementById('govahi-reset-settings-btn')?.addEventListener('click', reset);
+        var _bind = function(id, action) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('click', action);
+        };
+
+        _bind('govahi-offsetY-up-dec5', function() { settings.offsetY -= 5; apply(); });
+        _bind('govahi-offsetY-up-dec', function() { settings.offsetY -= 1; apply(); });
+        _bind('govahi-offsetY-up-inc', function() { settings.offsetY += 1; apply(); });
+        _bind('govahi-offsetY-up-inc5', function() { settings.offsetY += 5; apply(); });
+
+        _bind('govahi-offsetX-right-dec5', function() { settings.offsetX -= 5; apply(); });
+        _bind('govahi-offsetX-right-dec', function() { settings.offsetX -= 1; apply(); });
+        _bind('govahi-offsetX-right-inc', function() { settings.offsetX += 1; apply(); });
+        _bind('govahi-offsetX-right-inc5', function() { settings.offsetX += 5; apply(); });
+
+        _bind('govahi-width-dec5', function() { settings.widthOffset -= 5; apply(); });
+        _bind('govahi-width-dec', function() { settings.widthOffset -= 1; apply(); });
+        _bind('govahi-width-inc', function() { settings.widthOffset += 1; apply(); });
+        _bind('govahi-width-inc5', function() { settings.widthOffset += 5; apply(); });
+
+        _bind('govahi-cardGap-dec5', function() { settings.cardGap -= 5; apply(); });
+        _bind('govahi-cardGap-dec', function() { settings.cardGap -= 1; apply(); });
+        _bind('govahi-cardGap-inc', function() { settings.cardGap += 1; apply(); });
+        _bind('govahi-cardGap-inc5', function() { settings.cardGap += 5; apply(); });
+
+        _bind('govahi-cardGapH-dec5', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 5); apply(); });
+        _bind('govahi-cardGapH-dec', function() { settings.cardGapH = Math.max(0, settings.cardGapH - 1); apply(); });
+        _bind('govahi-cardGapH-inc', function() { settings.cardGapH += 1; apply(); });
+        _bind('govahi-cardGapH-inc5', function() { settings.cardGapH += 5; apply(); });
+
+        _bind('govahi-scale-out5', function() { settings.scale = Math.max(0.5, settings.scale - 0.05); apply(); });
+        _bind('govahi-scale-out', function() { settings.scale = Math.max(0.5, settings.scale - 0.01); apply(); });
+        _bind('govahi-scale-in', function() { settings.scale = Math.min(2, settings.scale + 0.01); apply(); });
+        _bind('govahi-scale-in5', function() { settings.scale = Math.min(2, settings.scale + 0.05); apply(); });
+
+        _bind('govahi-reset-settings-btn', reset);
+
         updateDisplay();
     }
 
@@ -80,5 +89,5 @@
         getSettings: function() { return Object.assign({}, settings); }
     };
 
-    console.log('✅ print-settings module loaded (غیرعملیاتی).');
+    console.log('تنظیمات چاپ بارگذاری شد.');
 })();
