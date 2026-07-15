@@ -1,9 +1,7 @@
-// modules/ui-panel.js
 (function() {
     'use strict';
     window.GovahiApp = window.GovahiApp || {};
 
-    // ========== استایل‌ها ==========
     var style = document.createElement('style');
     style.textContent = `
         #govahi-panel {
@@ -41,7 +39,6 @@
         #govahi-panel .value-display { width: 36px; text-align: center; font-weight: bold; font-size: 14px; color: #0050ef; }
         #govahi-panel .zoom-display { width: 45px; }
 
-        /* قاب جمع‌شو */
         #govahi-panel .collapsible-header {
             background: #f1f3f5;
             padding: 6px 10px;
@@ -180,14 +177,12 @@
     `;
     document.head.appendChild(style);
 
-    // ========== دکمه شناور ==========
     var toggleIcon = document.createElement('div');
     toggleIcon.id = 'govahi-floating-toggle';
     toggleIcon.innerHTML = '⚙️';
     toggleIcon.title = 'تنظیمات چاپ و گواهینامه';
     document.body.appendChild(toggleIcon);
 
-    // ========== پنل ==========
     var panel = document.createElement('div');
     panel.id = 'govahi-panel';
     panel.innerHTML = `
@@ -293,7 +288,6 @@
     `;
     document.body.appendChild(panel);
 
-    // ========== نمایش / مخفی ==========
     var isPanelVisible = false;
     toggleIcon.addEventListener('click', function() {
         if (isPanelVisible) {
@@ -313,7 +307,6 @@
         isPanelVisible = false;
     });
 
-    // ========== قابلیت درگ ==========
     (function() {
         var header = document.getElementById('govahi-panel-header');
         var dragging = false, startX, startY, initialLeft, initialTop;
@@ -345,7 +338,6 @@
         });
     })();
 
-    // ========== نمایش/مخفی‌سازی کنترل‌های فاصله ==========
     function updateGapControlsVisibility() {
         var gapDiv = document.getElementById('govahi-gap-controls');
         if (!gapDiv) return;
@@ -356,10 +348,6 @@
     var gapObserver = new MutationObserver(updateGapControlsVisibility);
     gapObserver.observe(document.body, { childList: true, subtree: true });
 
-    // ========== اتصال کنترل‌های چاپ (توسط print-settings.js انجام می‌شود) ==========
-    // (bindControls در main.js فراخوانی می‌شود)
-
-    // ========== API عمومی – همه بی‌اثر ==========
     GovahiApp.ui = {
         togglePanel: function() {
             if (panel.style.display === 'none') {
@@ -405,5 +393,5 @@
         }
     };
 
-    console.log('Govahi UI Panel ready. (بدون عملکرد)');
+    console.log('Govahi UI Panel ready.');
 })();
