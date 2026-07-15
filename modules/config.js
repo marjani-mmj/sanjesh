@@ -22,7 +22,6 @@
             extractedRow: 'extracted-row',
             rowBgColor: '#d4edda'
         },
-        // لیست کد مناطق مجاز برای استفاده از API
         authorizedRegions: ['1698']
     };
 })();
